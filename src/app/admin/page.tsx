@@ -153,12 +153,24 @@ export default function AdminPage() {
       const { expenses, ...eventData } = selectedEvent;
       
       // 1. Save/Update Event
+      // Carefully construct the object to avoid sending undefined or extra fields
+      const eventToUpsert: any = {
+        date: eventData.date,
+        address: eventData.address,
+        event_time: eventData.event_time,
+        manager_name: eventData.manager_name,
+        venue_name: eventData.venue_name,
+        reminder: eventData.reminder,
+        agreed_price: Number(eventData.agreed_price || 0),
+      };
+
+      if (selectedEvent.id) {
+        eventToUpsert.id = selectedEvent.id;
+      }
+      
       const { data: savedEvent, error: eventError } = await supabase
         .from('events')
-        .upsert({
-          id: selectedEvent.id || undefined,
-          ...eventData,
-        })
+        .upsert(eventToUpsert)
         .select()
         .single();
 
@@ -166,15 +178,17 @@ export default function AdminPage() {
 
       // 2. Handle Expenses
       if (expenses) {
-        // If updating, clear old expenses first (simplest way to handle updates/removals)
+        // If updating, clear old expenses first
         if (selectedEvent.id) {
           await supabase.from('expenses').delete().eq('event_id', selectedEvent.id);
         }
 
         if (expenses.length > 0) {
           const expensesToInsert = expenses.map(exp => ({
-            ...exp,
-            id: undefined, // Let Supabase generate IDs
+            type: exp.type,
+            quantity: Number(exp.quantity || 0),
+            unit_price: Number(exp.unit_price || 0),
+            total: Number(exp.total || 0),
             event_id: savedEvent.id
           }));
 
@@ -189,9 +203,9 @@ export default function AdminPage() {
       await fetchEvents();
       setIsModalOpen(false);
       setSelectedEvent(null);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving event:', error);
-      alert('Error al guardar el evento');
+      alert(`Error al guardar el evento: ${error.message || 'Error desconocido'}`);
     } finally {
       setLoading(false);
     }
@@ -232,8 +246,16 @@ export default function AdminPage() {
   const updateExpense = (index: number, field: keyof Expense, value: string | number) => {
     if (!selectedEvent || !selectedEvent.expenses) return;
     const newExpenses = [...selectedEvent.expenses];
-    const expense = { ...newExpenses[index], [field]: value };
     
+    // Ensure numeric fields are actually numbers
+    let processedValue = value;
+    if (field === 'quantity' || field === 'unit_price') {
+      processedValue = Number(value);
+    }
+    
+    const expense = { ...newExpenses[index], [field]: processedValue };
+    
+    // Recalculate total if quantity or price changed
     if (field === 'quantity' || field === 'unit_price') {
       expense.total = Number(expense.quantity) * Number(expense.unit_price);
     }
