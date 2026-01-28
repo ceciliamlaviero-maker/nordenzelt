@@ -324,6 +324,14 @@ export default function Home() {
           <p className="text-[10px] tracking-[0.2em] uppercase opacity-60 font-bold">
             © {new Date().getFullYear()} NORDEN ZELT - Todos los derechos reservados
           </p>
+          <div className="mt-4 flex justify-center">
+            <a 
+              href="/admin" 
+              className="text-[8px] text-transparent hover:text-brand-light-gray/20 transition-all cursor-default select-none"
+            >
+              Admin Access
+            </a>
+          </div>
         </div>
       </footer>
     </main>
