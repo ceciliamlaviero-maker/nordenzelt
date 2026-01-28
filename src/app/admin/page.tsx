@@ -67,6 +67,7 @@ export default function AdminPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<Partial<Event> | null>(null);
   const [loading, setLoading] = useState(false);
+  const [view, setView] = useState<'selection' | 'calendar' | 'dashboard'>('selection');
 
   // Auth check
   const handleLogin = (e: React.FormEvent) => {
@@ -313,128 +314,238 @@ export default function AdminPage() {
   return (
     <div className="min-h-screen bg-brand-light-gray/20 text-brand-nordic-blue font-sans">
       {/* Header */}
-      <header className="bg-brand-nordic-blue text-white p-6 shadow-lg flex justify-between items-center sticky top-0 z-30">
+      <header className="bg-brand-nordic-blue text-white p-4 md:p-6 shadow-lg flex justify-between items-center sticky top-0 z-30">
         <div className="flex items-center gap-4">
+          <button 
+            onClick={() => setView('selection')}
+            className={cn(
+              "p-2 hover:bg-white/10 rounded-xl transition-all",
+              view === 'selection' && "hidden"
+            )}
+          >
+            <ChevronLeft size={24} />
+          </button>
           <div>
-            <h1 className="font-cinzel text-2xl tracking-widest">NORDEN ADMIN</h1>
-            <p className="text-xs opacity-70">Gestión de Eventos y Finanzas</p>
+            <h1 className="font-cinzel text-xl md:text-2xl tracking-widest">NORDEN ADMIN</h1>
+            <p className="text-[10px] md:text-xs opacity-70">Gestión de Eventos y Finanzas</p>
           </div>
           {loading && (
-            <div className="animate-spin rounded-full h-5 w-5 border-2 border-brand-soft-gold border-t-transparent"></div>
+            <div className="animate-spin rounded-full h-4 w-4 md:h-5 md:w-5 border-2 border-brand-soft-gold border-t-transparent"></div>
           )}
         </div>
         <div className="text-right">
-          <p className="text-xs uppercase tracking-tighter opacity-70">Flujo de Caja Total</p>
-          <p className={cn("text-2xl font-black", totalCashFlow >= 0 ? "text-green-400" : "text-red-400")}>
+          <p className="text-[10px] uppercase tracking-tighter opacity-70">Flujo de Caja Total</p>
+          <p className={cn("text-lg md:text-2xl font-black", totalCashFlow >= 0 ? "text-green-400" : "text-red-400")}>
             ${totalCashFlow.toLocaleString()}
           </p>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto p-6 space-y-8">
-        {/* Reminders Alert */}
-        {upcomingReminders.length > 0 && (
-          <div className="bg-brand-soft-gold/20 border-2 border-brand-soft-gold p-6 rounded-3xl flex items-center justify-between gap-6 animate-pulse">
-            <div className="flex items-center gap-4">
-              <div className="bg-brand-soft-gold p-3 rounded-full text-brand-nordic-blue">
-                <AlertCircle size={24} />
+      <main className="max-w-7xl mx-auto p-4 md:p-6 space-y-6">
+        {view === 'selection' && (
+          <div className="grid md:grid-cols-2 gap-6 pt-10">
+            <button 
+              onClick={() => setView('calendar')}
+              className="bg-white p-10 rounded-[2rem] shadow-xl hover:shadow-2xl transition-all group flex flex-col items-center gap-6 border-2 border-transparent hover:border-brand-soft-gold"
+            >
+              <div className="bg-brand-pine-green/10 p-6 rounded-full group-hover:bg-brand-pine-green/20 transition-all">
+                <CalendarIcon size={48} className="text-brand-pine-green" />
               </div>
-              <div>
-                <h4 className="font-bold text-lg">Recordatorios Próximos</h4>
-                <p className="text-sm opacity-80">Tienes {upcomingReminders.length} evento(s) en exactamente 2 semanas.</p>
+              <div className="text-center">
+                <h3 className="text-2xl font-bold mb-2">Calendario</h3>
+                <p className="text-brand-nordic-blue/60">Gestiona fechas, lugares y detalles de eventos</p>
               </div>
-            </div>
-            <div className="flex gap-2">
-              {upcomingReminders.map(e => (
-                <button 
-                  key={e.id}
-                  onClick={() => sendWhatsAppReminder(e)}
-                  className="bg-brand-nordic-blue text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-opacity-90 transition-all flex items-center gap-2"
-                >
-                  <MessageCircle size={14} /> Recordar: {e.manager_name}
-                </button>
-              ))}
-            </div>
+            </button>
+
+            <button 
+              onClick={() => setView('dashboard')}
+              className="bg-white p-10 rounded-[2rem] shadow-xl hover:shadow-2xl transition-all group flex flex-col items-center gap-6 border-2 border-transparent hover:border-brand-soft-gold"
+            >
+              <div className="bg-brand-soft-gold/10 p-6 rounded-full group-hover:bg-brand-soft-gold/20 transition-all">
+                <DollarSign size={48} className="text-brand-soft-gold" />
+              </div>
+              <div className="text-center">
+                <h3 className="text-2xl font-bold mb-2">Dashboard Financiero</h3>
+                <p className="text-brand-nordic-blue/60">Análisis de ingresos, gastos y rentabilidad</p>
+              </div>
+            </button>
           </div>
         )}
 
-        {/* Calendar Header */}
-        <div className="flex items-center justify-between bg-white p-4 rounded-2xl shadow-sm">
-          <div className="flex items-center gap-4">
-            <button onClick={() => changeMonth(-1)} className="p-2 hover:bg-brand-light-gray rounded-full transition-all">
-              <ChevronLeft size={24} />
-            </button>
-            <h2 className="text-2xl font-bold min-w-[200px] text-center">
-              {monthNames[month]} {year}
-            </h2>
-            <button onClick={() => changeMonth(1)} className="p-2 hover:bg-brand-light-gray rounded-full transition-all">
-              <ChevronRight size={24} />
-            </button>
-          </div>
-          <button 
-            onClick={() => {
-              setSelectedEvent({
-                date: formatDate(new Date()),
-                expenses: [],
-                agreed_price: 0,
-                address: '',
-                event_time: '',
-                manager_name: '',
-                venue_name: '',
-                reminder: ''
-              });
-              setIsModalOpen(true);
-            }}
-            className="flex items-center gap-2 bg-brand-soft-gold text-brand-nordic-blue px-6 py-2 rounded-xl font-bold hover:bg-opacity-80 transition-all"
-          >
-            <Plus size={20} /> Nuevo Evento
-          </button>
-        </div>
-
-        {/* Weekdays */}
-        <div className="grid grid-cols-7 gap-4">
-          {["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"].map(day => (
-            <div key={day} className="text-center font-bold text-brand-nordic-blue/40 uppercase text-xs tracking-widest">
-              {day}
-            </div>
-          ))}
-        </div>
-
-        {/* Calendar Grid */}
-        <div className="grid grid-cols-7 gap-4">
-          {Array.from({ length: firstDayOfMonth }).map((_, i) => (
-            <div key={`empty-${i}`} className="h-32 md:h-40 bg-brand-light-gray/10 rounded-2xl"></div>
-          ))}
-          {Array.from({ length: daysInMonth }).map((_, i) => {
-            const day = i + 1;
-            const dateStr = formatDate(new Date(year, month, day));
-            const dayEvents = events.filter(e => e.date === dateStr);
-            const isToday = formatDate(new Date()) === dateStr;
-
-            return (
-              <button 
-                key={day}
-                onClick={() => handleDayClick(day)}
-                className={cn(
-                  "h-32 md:h-40 p-4 rounded-2xl border-2 transition-all flex flex-col items-start gap-2 text-left overflow-hidden",
-                  isToday ? "border-brand-soft-gold bg-brand-soft-gold/5" : "border-transparent bg-white shadow-sm hover:shadow-md hover:border-brand-light-gray",
-                  dayEvents.length > 0 ? "bg-brand-pine-green/5" : ""
-                )}
-              >
-                <span className={cn("text-lg font-bold", isToday ? "text-brand-soft-gold" : "text-brand-nordic-blue")}>
-                  {day}
-                </span>
-                <div className="w-full space-y-1">
-                  {dayEvents.map(e => (
-                    <div key={e.id} className="text-[10px] md:text-xs bg-brand-pine-green text-white px-2 py-1 rounded-lg truncate w-full">
-                      {e.manager_name || 'Sin nombre'}
-                    </div>
+        {view === 'calendar' && (
+          <>
+            {/* Reminders Alert */}
+            {upcomingReminders.length > 0 && (
+              <div className="bg-brand-soft-gold/20 border-2 border-brand-soft-gold p-4 md:p-6 rounded-3xl flex flex-col md:flex-row items-center justify-between gap-4 md:gap-6 animate-pulse">
+                <div className="flex items-center gap-4">
+                  <div className="bg-brand-soft-gold p-3 rounded-full text-brand-nordic-blue">
+                    <AlertCircle size={24} />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-lg">Recordatorios Próximos</h4>
+                    <p className="text-sm opacity-80">Tienes {upcomingReminders.length} evento(s) en exactamente 2 semanas.</p>
+                  </div>
+                </div>
+                <div className="flex flex-wrap gap-2 justify-center">
+                  {upcomingReminders.map(e => (
+                    <button 
+                      key={e.id}
+                      onClick={() => sendWhatsAppReminder(e)}
+                      className="bg-brand-nordic-blue text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-opacity-90 transition-all flex items-center gap-2"
+                    >
+                      <MessageCircle size={14} /> Recordar: {e.manager_name}
+                    </button>
                   ))}
                 </div>
+              </div>
+            )}
+
+            {/* Calendar Header */}
+            <div className="flex flex-col md:flex-row items-center justify-between bg-white p-4 rounded-2xl shadow-sm gap-4">
+              <div className="flex items-center gap-4">
+                <button onClick={() => changeMonth(-1)} className="p-2 hover:bg-brand-light-gray rounded-full transition-all">
+                  <ChevronLeft size={24} />
+                </button>
+                <h2 className="text-xl md:text-2xl font-bold min-w-[150px] md:min-w-[200px] text-center">
+                  {monthNames[month]} {year}
+                </h2>
+                <button onClick={() => changeMonth(1)} className="p-2 hover:bg-brand-light-gray rounded-full transition-all">
+                  <ChevronRight size={24} />
+                </button>
+              </div>
+              <button 
+                onClick={() => {
+                  setSelectedEvent({
+                    date: formatDate(new Date()),
+                    expenses: [],
+                    agreed_price: 0,
+                    address: '',
+                    event_time: '',
+                    manager_name: '',
+                    venue_name: '',
+                    reminder: ''
+                  });
+                  setIsModalOpen(true);
+                }}
+                className="w-full md:w-auto flex items-center justify-center gap-2 bg-brand-soft-gold text-brand-nordic-blue px-6 py-2 rounded-xl font-bold hover:bg-opacity-80 transition-all"
+              >
+                <Plus size={20} /> Nuevo Evento
               </button>
-            );
-          })}
-        </div>
+            </div>
+
+            {/* Weekdays */}
+            <div className="grid grid-cols-7 gap-1 md:gap-4">
+              {["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"].map(day => (
+                <div key={day} className="text-center font-bold text-brand-nordic-blue/40 uppercase text-[10px] md:text-xs tracking-widest">
+                  {day}
+                </div>
+              ))}
+            </div>
+
+            {/* Calendar Grid */}
+            <div className="grid grid-cols-7 gap-1 md:gap-4">
+              {Array.from({ length: firstDayOfMonth }).map((_, i) => (
+                <div key={`empty-${i}`} className="h-20 md:h-32 bg-brand-light-gray/5 rounded-xl md:rounded-2xl"></div>
+              ))}
+              {Array.from({ length: daysInMonth }).map((_, i) => {
+                const day = i + 1;
+                const dateStr = formatDate(new Date(year, month, day));
+                const dayEvents = events.filter(e => e.date === dateStr);
+                const isToday = formatDate(new Date()) === dateStr;
+
+                return (
+                  <button 
+                    key={day}
+                    onClick={() => handleDayClick(day)}
+                    className={cn(
+                      "h-20 md:h-32 p-2 md:p-4 rounded-xl md:rounded-2xl border-2 transition-all flex flex-col items-start gap-1 text-left overflow-hidden",
+                      isToday ? "border-brand-soft-gold bg-brand-soft-gold/5" : "border-transparent bg-white shadow-sm hover:shadow-md hover:border-brand-light-gray",
+                      dayEvents.length > 0 ? "bg-brand-pine-green/5" : ""
+                    )}
+                  >
+                    <span className={cn("text-sm md:text-lg font-bold", isToday ? "text-brand-soft-gold" : "text-brand-nordic-blue")}>
+                      {day}
+                    </span>
+                    <div className="w-full space-y-1 overflow-hidden">
+                      {dayEvents.map(e => (
+                        <div key={e.id} className="text-[8px] md:text-[10px] bg-brand-pine-green text-white px-1 md:px-2 py-0.5 md:py-1 rounded md:rounded-lg truncate w-full">
+                          {e.manager_name || 'Sin nombre'}
+                        </div>
+                      ))}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </>
+        )}
+
+        {view === 'dashboard' && (
+          <div className="space-y-6">
+            <div className="grid md:grid-cols-3 gap-6">
+              <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-brand-light-gray/20">
+                <p className="text-xs font-bold uppercase tracking-widest text-brand-nordic-blue/40 mb-2">Ingresos Totales</p>
+                <p className="text-3xl font-black text-brand-nordic-blue">
+                  ${events.reduce((sum, e) => sum + (e.agreed_price || 0), 0).toLocaleString()}
+                </p>
+              </div>
+              <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-brand-light-gray/20">
+                <p className="text-xs font-bold uppercase tracking-widest text-brand-nordic-blue/40 mb-2">Gastos Totales</p>
+                <p className="text-3xl font-black text-red-400">
+                  ${events.reduce((sum, e) => sum + (e.expenses || []).reduce((s, ex) => s + ex.total, 0), 0).toLocaleString()}
+                </p>
+              </div>
+              <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-brand-light-gray/20">
+                <p className="text-xs font-bold uppercase tracking-widest text-brand-nordic-blue/40 mb-2">Rentabilidad Promedio</p>
+                <p className="text-3xl font-black text-green-400">
+                  {events.length > 0 
+                    ? Math.round((totalCashFlow / events.reduce((sum, e) => sum + (e.agreed_price || 1), 0)) * 100) 
+                    : 0}%
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-[2rem] shadow-sm border border-brand-light-gray/20 overflow-hidden">
+              <div className="p-6 border-b border-brand-light-gray/20 flex justify-between items-center">
+                <h3 className="font-bold text-xl">Desglose por Evento</h3>
+                <div className="text-sm text-brand-nordic-blue/60">{events.length} eventos registrados</div>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left">
+                  <thead className="bg-brand-light-gray/10 text-[10px] uppercase font-bold tracking-widest text-brand-nordic-blue/40">
+                    <tr>
+                      <th className="px-6 py-4">Fecha</th>
+                      <th className="px-6 py-4">Evento / Lugar</th>
+                      <th className="px-6 py-4">Ingreso</th>
+                      <th className="px-6 py-4">Gastos</th>
+                      <th className="px-6 py-4">Ganancia</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-brand-light-gray/10">
+                    {events.map(event => {
+                      const expensesTotal = (event.expenses || []).reduce((sum, exp) => sum + exp.total, 0);
+                      const profit = (event.agreed_price || 0) - expensesTotal;
+                      return (
+                        <tr key={event.id} className="hover:bg-brand-light-gray/5 transition-all">
+                          <td className="px-6 py-4 font-medium">{event.date}</td>
+                          <td className="px-6 py-4">
+                            <div className="font-bold">{event.manager_name}</div>
+                            <div className="text-xs opacity-60">{event.venue_name}</div>
+                          </td>
+                          <td className="px-6 py-4">${event.agreed_price?.toLocaleString()}</td>
+                          <td className="px-6 py-4 text-red-400">${expensesTotal.toLocaleString()}</td>
+                          <td className={cn("px-6 py-4 font-bold", profit >= 0 ? "text-green-500" : "text-red-500")}>
+                            ${profit.toLocaleString()}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
 
       {/* Modal */}
