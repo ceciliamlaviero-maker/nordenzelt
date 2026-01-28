@@ -1,0 +1,76 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Montserrat:wght@300;400;500&display=swap');
+
+:root {
+  --brand-nordic-blue: #1F3A5F;
+  --brand-white: #FFFFFF;
+  --brand-light-gray: #E6E8EB;
+  --brand-pine-green: #2F4F4F;
+  --brand-soft-gold: #C9B27D;
+}
+
+body {
+  color: var(--brand-nordic-blue);
+  background: var(--brand-white);
+  font-family: 'Cormorant Garamond', serif;
+  overflow-x: hidden;
+}
+
+body ::selection {
+  background-color: var(--brand-nordic-blue);
+  color: var(--brand-white);
+}
+
+h1, h2, h3, h4, .font-cinzel {
+  font-family: 'Cinzel', serif;
+}
+
+.font-script {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+}
+
+.font-sans {
+  font-family: 'Montserrat', sans-serif;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 1s ease-out forwards;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--brand-nordic-blue);
+  border-radius: 20px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--brand-pine-green);
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+
+/* Firefox support */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--brand-nordic-blue) transparent;
+}

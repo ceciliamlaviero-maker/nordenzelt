@@ -1,0 +1,12 @@
+
+> norden-zelt@0.1.0 dev
+> next dev
+
+   ▲ Next.js 14.1.0
+   - Local:        http://localhost:3000
+   - Environments: .env.local
+
+ ✓ Ready in 2.4s
+ ○ Compiling / ...
+ ✓ Compiled / in 3.2s (458 modules)
+ ✓ Compiled in 454ms (458 modules)
