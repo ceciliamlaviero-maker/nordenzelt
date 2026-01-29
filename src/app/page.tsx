@@ -306,7 +306,7 @@ export default function Home() {
           <div className="space-y-8">
             <h3 className="font-cinzel text-3xl tracking-widest text-brand-white">NORDEN<br/><span className="text-brand-soft-gold">ZELT</span></h3>
             <p className="font-sans text-sm leading-relaxed opacity-80 max-w-xs">
-              Especialistas en la creación de espacios temporales exclusivos para eventos sociales y corporativos de alto nivel.
+              Especialistas Carpas para eventos sociales y corporativos de alto nivel.
             </p>
           </div>
           
