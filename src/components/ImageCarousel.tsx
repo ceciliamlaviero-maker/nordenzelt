@@ -3,20 +3,25 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-const images = [
-  "/images/WhatsApp Image 2026-01-27 at 13.56.30.jpeg",
-  "/images/WhatsApp Image 2026-01-27 at 13.57.24.jpeg",
-  "/images/WhatsApp Image 2026-01-27 at 14.01.50.jpeg",
-  "/images/WhatsApp Image 2026-01-16 at 11.50.25 (1).jpeg",
-  "/images/WhatsApp Image 2026-01-16 at 11.50.25.jpeg",
-];
+interface ImageCarouselProps {
+  images?: string[];
+}
 
-export default function ImageCarousel() {
+export default function ImageCarousel({ images: propImages }: ImageCarouselProps) {
+  const defaultImages = [
+    "/images/WhatsApp Image 2026-01-27 at 13.56.30.jpeg",
+    "/images/WhatsApp Image 2026-01-27 at 13.57.24.jpeg",
+    "/images/WhatsApp Image 2026-01-27 at 14.01.50.jpeg",
+    "/images/WhatsApp Image 2026-01-16 at 11.50.25 (1).jpeg",
+    "/images/WhatsApp Image 2026-01-16 at 11.50.25.jpeg",
+  ];
+
+  const images = propImages && propImages.length > 0 ? propImages : defaultImages;
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const nextSlide = useCallback(() => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
-  }, []);
+  }, [images.length]);
 
   const prevSlide = () => {
     setCurrentIndex((prevIndex) => (prevIndex - 1 + images.length) % images.length);

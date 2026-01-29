@@ -4,6 +4,12 @@ import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Instagram, Mail, MessageCircle, MapPin, ChevronDown } from 'lucide-react';
 import ImageCarousel from '@/components/ImageCarousel';
+import { supabase } from '@/lib/supabase';
+
+interface SiteAsset {
+  url: string;
+  section: string;
+}
 
 interface FormData {
   nombreApellido: string;
@@ -22,6 +28,21 @@ interface FormData {
 
 export default function Home() {
   const { register, handleSubmit, watch, formState: { errors } } = useForm<FormData>();
+  const [assets, setAssets] = useState<SiteAsset[]>([]);
+
+  useEffect(() => {
+    const fetchAssets = async () => {
+      const { data } = await supabase
+        .from('site_assets')
+        .select('url, section')
+        .order('display_order', { ascending: true });
+      if (data) setAssets(data);
+    };
+    fetchAssets();
+  }, []);
+
+  const heroImage = assets.find(a => a.section === 'hero')?.url || "/images/WhatsApp Image 2026-01-16 at 11.50.25 (1).jpeg";
+  const carouselImages = assets.filter(a => a.section === 'carousel').map(a => a.url);
   
   const onSubmit = (data: FormData) => {
     const phoneNumber = "5491132747900";
@@ -53,7 +74,7 @@ export default function Home() {
         {/* Background Image */}
         <div className="absolute inset-0 z-0">
           <img 
-            src="/images/WhatsApp Image 2026-01-16 at 11.50.25 (1).jpeg" 
+            src={heroImage} 
             alt="Norden Zelt Background" 
             className="w-full h-full object-cover"
           />
@@ -96,7 +117,7 @@ export default function Home() {
             </h2>
             
             <div className="max-w-4xl mx-auto shadow-2xl rounded-3xl overflow-hidden border-4 border-brand-soft-gold/20">
-              <ImageCarousel />
+              <ImageCarousel images={carouselImages} />
             </div>
           </div>
 

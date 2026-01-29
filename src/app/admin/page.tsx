@@ -509,10 +509,8 @@ export default function AdminPage() {
 
             <div className="flex-1 overflow-y-auto custom-scrollbar space-y-8 pr-2">
               {[
-                { id: 'hero', name: 'Portada (Hero)', desc: 'Imágenes grandes de la parte superior' },
-                { id: 'carousel', name: 'Carrusel de Fotos', desc: 'Galería de fotos general' },
-                { id: 'services', name: 'Servicios', desc: 'Fotos para secciones de Carpas, Catering, etc.' },
-                { id: 'about', name: 'Nosotros', desc: 'Imágenes de la sección "Quiénes somos"' }
+                { id: 'hero', name: 'Portada (Hero)', desc: 'Imagen principal de la parte superior' },
+                { id: 'carousel', name: 'Carrusel de Fotos', desc: 'Galería de fotos general' }
               ].map(section => (
                 <div key={section.id} className="bg-white p-6 rounded-[2rem] shadow-sm border border-brand-light-gray/20 space-y-4">
                   <div className="flex justify-between items-center">
