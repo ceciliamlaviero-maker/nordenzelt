@@ -179,7 +179,7 @@ export default function Home() {
                         getContent('service_opt_3', 'Livings y Sillas'),
                         getContent('service_opt_4', 'Pista de baile')
                       ].map((item, i) => (
-                        <li key={i} className="flex items-center gap-3 text-xs md:text-sm font-medium opacity-70">
+                        <li key={i} className="flex items-center gap-3 text-sm font-medium opacity-70">
                           <span className="h-2 w-2 rounded-full bg-brand-soft-gold flex-shrink-0"></span>
                           {item}
                         </li>
@@ -189,8 +189,8 @@ export default function Home() {
                 </div>
               </div>
               
-              <div className="mt-14 pt-8 border-t border-brand-light-gray">
-                <p className="text-sm italic text-brand-nordic-blue/70 font-medium flex items-center gap-3">
+              <div className="mt-12 pt-8 border-t border-brand-soft-gold/30">
+                <p className="text-base italic text-brand-nordic-blue/70 font-medium flex items-center gap-3">
                   <span className="h-2.5 w-2.5 bg-brand-soft-gold rounded-full"></span>
                   {getContent('capacity_text', 'Capacidad adaptable entre 60 a 400 personas')}
                 </p>
