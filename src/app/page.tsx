@@ -182,14 +182,11 @@ export default function Home() {
                 </p>
                 <p className="flex items-center gap-5 leading-relaxed">
                   <span className="w-3 h-3 bg-brand-soft-gold rounded-full flex-shrink-0"></span>
-                  Modulable de 6 metros x 12 Escalables
+                  Modulable de 6 metros x 12 metros. escalables
                 </p>
                 <p className="flex items-center gap-5 leading-relaxed">
                   <span className="w-3 h-3 bg-brand-soft-gold rounded-full flex-shrink-0"></span>
                   Diseño adaptable a cualquier terreno y clima
-                </p>
-                <p className="flex items-center gap-3 text-sm mt-12 italic text-brand-soft-gold font-medium">
-                  * Para eventos entre 60 a 400 personas.
                 </p>
               </div>
             </div>
