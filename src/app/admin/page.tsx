@@ -16,7 +16,9 @@ import {
   User,
   Home as HomeIcon,
   AlertCircle,
-  MessageCircle
+  MessageCircle,
+  Image as ImageIcon,
+  Upload
 } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -46,6 +48,14 @@ interface Event {
   expenses: Expense[];
 }
 
+interface SiteAsset {
+  id: string;
+  url: string;
+  section: string;
+  storage_path: string;
+  display_order: number;
+}
+
 // --- Helper Functions ---
 const getDaysInMonth = (year: number, month: number) => {
   return new Date(year, month + 1, 0).getDate();
@@ -64,10 +74,12 @@ export default function AdminPage() {
   const [password, setPassword] = useState('');
   const [currentDate, setCurrentDate] = useState(new Date());
   const [events, setEvents] = useState<Event[]>([]);
+  const [assets, setAssets] = useState<SiteAsset[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<Partial<Event> | null>(null);
   const [loading, setLoading] = useState(false);
-  const [view, setView] = useState<'selection' | 'calendar' | 'dashboard'>('selection');
+  const [uploading, setUploading] = useState(false);
+  const [view, setView] = useState<'selection' | 'calendar' | 'dashboard' | 'multimedia'>('selection');
 
   // Auth check
   const handleLogin = (e: React.FormEvent) => {
@@ -101,11 +113,92 @@ export default function AdminPage() {
     }
   };
 
+  const fetchAssets = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('site_assets')
+        .select('*')
+        .order('display_order', { ascending: true });
+      if (error) throw error;
+      setAssets(data || []);
+    } catch (error) {
+      console.error('Error fetching assets:', error);
+    }
+  };
+
   useEffect(() => {
     if (isAuthenticated) {
       fetchEvents();
+      fetchAssets();
     }
   }, [isAuthenticated]);
+
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>, section: string) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+      const filePath = `${section}/${fileName}`;
+
+      // 1. Upload to Storage
+      const { error: uploadError } = await supabase.storage
+        .from('gallery')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      // 2. Get Public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('gallery')
+        .getPublicUrl(filePath);
+
+      // 3. Save to DB
+      const { error: dbError } = await supabase
+        .from('site_assets')
+        .insert([{ url: publicUrl, storage_path: filePath, section }]);
+
+      if (dbError) throw dbError;
+
+      await fetchAssets();
+      alert("Imagen subida con éxito");
+    } catch (error: any) {
+      console.error("Error uploading image:", error);
+      alert(`Error al subir la imagen: ${error.message}`);
+    } finally {
+      setUploading(false);
+      // Reset input
+      e.target.value = '';
+    }
+  };
+
+  const handleDeleteAsset = async (asset: SiteAsset) => {
+    if (!confirm("¿Estás seguro de eliminar esta imagen?")) return;
+
+    try {
+      // 1. Delete from Storage
+      const { error: storageError } = await supabase.storage
+        .from('gallery')
+        .remove([asset.storage_path]);
+
+      if (storageError) throw storageError;
+
+      // 2. Delete from DB
+      const { error: dbError } = await supabase
+        .from('site_assets')
+        .delete()
+        .eq('id', asset.id);
+
+      if (dbError) throw dbError;
+
+      await fetchAssets();
+    } catch (error: any) {
+      console.error("Error deleting asset:", error);
+      alert(`Error al eliminar la imagen: ${error.message}`);
+    }
+  };
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
@@ -365,7 +458,7 @@ export default function AdminPage() {
 
       <main className="flex-1 max-w-7xl mx-auto w-full p-3 md:p-4 flex flex-col min-h-0 space-y-4 overflow-hidden">
         {view === 'selection' && (
-          <div className="grid md:grid-cols-2 gap-6 pt-10 overflow-y-auto">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 pt-10 overflow-y-auto">
             <button 
               onClick={() => setView('calendar')}
               className="bg-white p-8 rounded-[2rem] shadow-xl hover:shadow-2xl transition-all group flex flex-col items-center gap-6 border-2 border-transparent hover:border-brand-soft-gold"
@@ -391,6 +484,85 @@ export default function AdminPage() {
                 <p className="text-sm text-brand-nordic-blue/60">Análisis de ingresos, gastos y rentabilidad</p>
               </div>
             </button>
+
+            <button 
+              onClick={() => setView('multimedia')}
+              className="bg-white p-8 rounded-[2rem] shadow-xl hover:shadow-2xl transition-all group flex flex-col items-center gap-6 border-2 border-transparent hover:border-brand-soft-gold"
+            >
+              <div className="bg-brand-nordic-blue/10 p-6 rounded-full group-hover:bg-brand-nordic-blue/20 transition-all">
+                <ImageIcon size={40} className="text-brand-nordic-blue" />
+              </div>
+              <div className="text-center">
+                <h3 className="text-xl font-bold mb-2">Multimedia</h3>
+                <p className="text-sm text-brand-nordic-blue/60">Gestiona las imágenes de toda la plataforma</p>
+              </div>
+            </button>
+          </div>
+        )}
+
+        {view === 'multimedia' && (
+          <div className="flex-1 flex flex-col min-h-0 space-y-6 overflow-hidden pb-4">
+            <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-brand-light-gray/20">
+              <h3 className="text-2xl font-bold text-brand-nordic-blue mb-2">Gestor Multimedia</h3>
+              <p className="text-sm text-brand-nordic-blue/60">Sube y organiza las fotos de cada sección de la web.</p>
+            </div>
+
+            <div className="flex-1 overflow-y-auto custom-scrollbar space-y-8 pr-2">
+              {[
+                { id: 'hero', name: 'Portada (Hero)', desc: 'Imágenes grandes de la parte superior' },
+                { id: 'carousel', name: 'Carrusel de Fotos', desc: 'Galería de fotos general' },
+                { id: 'services', name: 'Servicios', desc: 'Fotos para secciones de Carpas, Catering, etc.' },
+                { id: 'about', name: 'Nosotros', desc: 'Imágenes de la sección "Quiénes somos"' }
+              ].map(section => (
+                <div key={section.id} className="bg-white p-6 rounded-[2rem] shadow-sm border border-brand-light-gray/20 space-y-4">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <h4 className="font-bold text-lg text-brand-nordic-blue">{section.name}</h4>
+                      <p className="text-xs text-brand-nordic-blue/50">{section.desc}</p>
+                    </div>
+                    <label className={cn(
+                      "flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer",
+                      uploading ? "bg-brand-light-gray text-brand-nordic-blue/40 cursor-not-allowed" : "bg-brand-soft-gold text-brand-nordic-blue hover:bg-opacity-80"
+                    )}>
+                      {uploading ? <div className="animate-spin rounded-full h-3 w-3 border-2 border-brand-nordic-blue border-t-transparent"></div> : <Upload size={14} />}
+                      {uploading ? 'Subiendo...' : 'Subir Foto'}
+                      <input 
+                        type="file" 
+                        accept="image/*" 
+                        className="hidden" 
+                        onChange={(e) => handleUpload(e, section.id)}
+                        disabled={uploading}
+                      />
+                    </label>
+                  </div>
+
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                    {assets.filter(a => a.section === section.id).map(asset => (
+                      <div key={asset.id} className="group relative aspect-square rounded-2xl overflow-hidden bg-brand-light-gray/10 border border-brand-light-gray/20">
+                        <img 
+                          src={asset.url} 
+                          alt={section.name} 
+                          className="w-full h-full object-cover transition-transform group-hover:scale-110"
+                        />
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                          <button 
+                            onClick={() => handleDeleteAsset(asset)}
+                            className="bg-red-500 text-white p-2 rounded-full hover:bg-red-600 transition-colors"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                    {assets.filter(a => a.section === section.id).length === 0 && (
+                      <div className="col-span-full py-10 text-center border-2 border-dashed border-brand-light-gray/20 rounded-2xl">
+                        <p className="text-xs text-brand-nordic-blue/30 font-medium">No hay fotos en esta sección</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
