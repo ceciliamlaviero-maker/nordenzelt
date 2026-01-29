@@ -334,9 +334,9 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="min-h-screen bg-brand-light-gray/20 text-brand-nordic-blue font-sans">
-      {/* Header */}
-      <header className="bg-brand-nordic-blue text-white p-4 md:p-6 shadow-lg flex justify-between items-center sticky top-0 z-30">
+    <div className="h-screen bg-brand-light-gray/20 text-brand-nordic-blue font-sans flex flex-col overflow-hidden">
+      {/* Header - Fixed Height */}
+      <header className="bg-brand-nordic-blue text-white p-3 md:p-4 shadow-lg flex justify-between items-center shrink-0 z-30">
         <div className="flex items-center gap-4">
           <button 
             onClick={() => setView('selection')}
@@ -345,67 +345,67 @@ export default function AdminPage() {
               view === 'selection' && "hidden"
             )}
           >
-            <ChevronLeft size={24} />
+            <ChevronLeft size={20} />
           </button>
           <div>
-            <h1 className="font-cinzel text-xl md:text-2xl tracking-widest">NORDEN ADMIN</h1>
-            <p className="text-[10px] md:text-xs opacity-70">Gestión de Eventos y Finanzas</p>
+            <h1 className="font-cinzel text-lg md:text-xl tracking-widest">NORDEN ADMIN</h1>
+            <p className="text-[10px] opacity-70">Gestión de Eventos y Finanzas</p>
           </div>
           {loading && (
-            <div className="animate-spin rounded-full h-4 w-4 md:h-5 md:w-5 border-2 border-brand-soft-gold border-t-transparent"></div>
+            <div className="animate-spin rounded-full h-4 w-4 border-2 border-brand-soft-gold border-t-transparent"></div>
           )}
         </div>
         <div className="text-right">
           <p className="text-[10px] uppercase tracking-tighter opacity-70">Flujo de Caja Total</p>
-          <p className={cn("text-lg md:text-2xl font-black", totalCashFlow >= 0 ? "text-green-400" : "text-red-400")}>
+          <p className={cn("text-base md:text-xl font-black", totalCashFlow >= 0 ? "text-green-400" : "text-red-400")}>
             ${totalCashFlow.toLocaleString()}
           </p>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto p-4 md:p-6 space-y-6">
+      <main className="flex-1 max-w-7xl mx-auto w-full p-3 md:p-4 flex flex-col min-h-0 space-y-4 overflow-hidden">
         {view === 'selection' && (
-          <div className="grid md:grid-cols-2 gap-6 pt-10">
+          <div className="grid md:grid-cols-2 gap-6 pt-10 overflow-y-auto">
             <button 
               onClick={() => setView('calendar')}
-              className="bg-white p-10 rounded-[2rem] shadow-xl hover:shadow-2xl transition-all group flex flex-col items-center gap-6 border-2 border-transparent hover:border-brand-soft-gold"
+              className="bg-white p-8 rounded-[2rem] shadow-xl hover:shadow-2xl transition-all group flex flex-col items-center gap-6 border-2 border-transparent hover:border-brand-soft-gold"
             >
               <div className="bg-brand-pine-green/10 p-6 rounded-full group-hover:bg-brand-pine-green/20 transition-all">
-                <CalendarIcon size={48} className="text-brand-pine-green" />
+                <CalendarIcon size={40} className="text-brand-pine-green" />
               </div>
               <div className="text-center">
-                <h3 className="text-2xl font-bold mb-2">Calendario</h3>
-                <p className="text-brand-nordic-blue/60">Gestiona fechas, lugares y detalles de eventos</p>
+                <h3 className="text-xl font-bold mb-2">Calendario</h3>
+                <p className="text-sm text-brand-nordic-blue/60">Gestiona fechas, lugares y detalles de eventos</p>
               </div>
             </button>
 
             <button 
               onClick={() => setView('dashboard')}
-              className="bg-white p-10 rounded-[2rem] shadow-xl hover:shadow-2xl transition-all group flex flex-col items-center gap-6 border-2 border-transparent hover:border-brand-soft-gold"
+              className="bg-white p-8 rounded-[2rem] shadow-xl hover:shadow-2xl transition-all group flex flex-col items-center gap-6 border-2 border-transparent hover:border-brand-soft-gold"
             >
               <div className="bg-brand-soft-gold/10 p-6 rounded-full group-hover:bg-brand-soft-gold/20 transition-all">
-                <DollarSign size={48} className="text-brand-soft-gold" />
+                <DollarSign size={40} className="text-brand-soft-gold" />
               </div>
               <div className="text-center">
-                <h3 className="text-2xl font-bold mb-2">Dashboard Financiero</h3>
-                <p className="text-brand-nordic-blue/60">Análisis de ingresos, gastos y rentabilidad</p>
+                <h3 className="text-xl font-bold mb-2">Dashboard Financiero</h3>
+                <p className="text-sm text-brand-nordic-blue/60">Análisis de ingresos, gastos y rentabilidad</p>
               </div>
             </button>
           </div>
         )}
 
         {view === 'calendar' && (
-          <>
-            {/* Reminders Alert */}
+          <div className="flex-1 flex flex-col min-h-0 space-y-3">
+            {/* Reminders Alert - Compact */}
             {upcomingReminders.length > 0 && (
-              <div className="bg-brand-soft-gold/20 border-2 border-brand-soft-gold p-4 md:p-6 rounded-3xl flex flex-col md:flex-row items-center justify-between gap-4 md:gap-6 animate-pulse">
-                <div className="flex items-center gap-4">
-                  <div className="bg-brand-soft-gold p-3 rounded-full text-brand-nordic-blue">
-                    <AlertCircle size={24} />
+              <div className="bg-brand-soft-gold/20 border-2 border-brand-soft-gold p-3 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-3 shrink-0">
+                <div className="flex items-center gap-3">
+                  <div className="bg-brand-soft-gold p-2 rounded-full text-brand-nordic-blue">
+                    <AlertCircle size={18} />
                   </div>
                   <div>
-                    <h4 className="font-bold text-lg">Recordatorios Próximos</h4>
-                    <p className="text-sm opacity-80">Tienes {upcomingReminders.length} evento(s) en exactamente 2 semanas.</p>
+                    <h4 className="font-bold text-sm">Recordatorios Próximos</h4>
+                    <p className="text-[10px] opacity-80">Tienes {upcomingReminders.length} evento(s) en 2 semanas.</p>
                   </div>
                 </div>
                 <div className="flex flex-wrap gap-2 justify-center">
@@ -413,26 +413,26 @@ export default function AdminPage() {
                     <button 
                       key={e.id}
                       onClick={() => sendWhatsAppReminder(e)}
-                      className="bg-brand-nordic-blue text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-opacity-90 transition-all flex items-center gap-2"
+                      className="bg-brand-nordic-blue text-white px-3 py-1 rounded-lg text-[10px] font-bold hover:bg-opacity-90 transition-all flex items-center gap-1"
                     >
-                      <MessageCircle size={14} /> Recordar: {e.manager_name}
+                      <MessageCircle size={12} /> {e.manager_name}
                     </button>
                   ))}
                 </div>
               </div>
             )}
 
-            {/* Calendar Header */}
-            <div className="flex flex-col md:flex-row items-center justify-between bg-white p-4 rounded-2xl shadow-sm gap-4">
+            {/* Calendar Header - Compact */}
+            <div className="flex items-center justify-between bg-white p-3 rounded-2xl shadow-sm gap-4 shrink-0">
               <div className="flex items-center gap-4">
-                <button onClick={() => changeMonth(-1)} className="p-2 hover:bg-brand-light-gray rounded-full transition-all">
-                  <ChevronLeft size={24} />
+                <button onClick={() => changeMonth(-1)} className="p-1.5 hover:bg-brand-light-gray rounded-full transition-all">
+                  <ChevronLeft size={20} />
                 </button>
-                <h2 className="text-xl md:text-2xl font-bold min-w-[150px] md:min-w-[200px] text-center">
+                <h2 className="text-lg md:text-xl font-bold min-w-[140px] text-center">
                   {monthNames[month]} {year}
                 </h2>
-                <button onClick={() => changeMonth(1)} className="p-2 hover:bg-brand-light-gray rounded-full transition-all">
-                  <ChevronRight size={24} />
+                <button onClick={() => changeMonth(1)} className="p-1.5 hover:bg-brand-light-gray rounded-full transition-all">
+                  <ChevronRight size={20} />
                 </button>
               </div>
               <button 
@@ -449,25 +449,25 @@ export default function AdminPage() {
                   });
                   setIsModalOpen(true);
                 }}
-                className="w-full md:w-auto flex items-center justify-center gap-2 bg-brand-soft-gold text-brand-nordic-blue px-6 py-2 rounded-xl font-bold hover:bg-opacity-80 transition-all"
+                className="flex items-center justify-center gap-2 bg-brand-soft-gold text-brand-nordic-blue px-4 py-1.5 rounded-xl text-sm font-bold hover:bg-opacity-80 transition-all"
               >
-                <Plus size={20} /> Nuevo Evento
+                <Plus size={18} /> Nuevo Evento
               </button>
             </div>
 
             {/* Weekdays */}
-            <div className="grid grid-cols-7 gap-1 md:gap-4">
+            <div className="grid grid-cols-7 gap-2 shrink-0">
               {["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"].map(day => (
-                <div key={day} className="text-center font-bold text-brand-nordic-blue/40 uppercase text-[10px] md:text-xs tracking-widest">
+                <div key={day} className="text-center font-bold text-brand-nordic-blue/40 uppercase text-[10px] tracking-widest">
                   {day}
                 </div>
               ))}
             </div>
 
-            {/* Calendar Grid */}
-            <div className="grid grid-cols-7 gap-1 md:gap-4">
+            {/* Calendar Grid - Flexible height */}
+            <div className="flex-1 grid grid-cols-7 gap-2 min-h-0 pb-2">
               {Array.from({ length: firstDayOfMonth }).map((_, i) => (
-                <div key={`empty-${i}`} className="h-20 md:h-32 bg-brand-light-gray/5 rounded-xl md:rounded-2xl"></div>
+                <div key={`empty-${i}`} className="bg-brand-light-gray/5 rounded-xl"></div>
               ))}
               {Array.from({ length: daysInMonth }).map((_, i) => {
                 const day = i + 1;
@@ -480,17 +480,17 @@ export default function AdminPage() {
                     key={day}
                     onClick={() => handleDayClick(day)}
                     className={cn(
-                      "h-20 md:h-32 p-2 md:p-4 rounded-xl md:rounded-2xl border-2 transition-all flex flex-col items-start gap-1 text-left overflow-hidden",
+                      "p-2 rounded-xl border-2 transition-all flex flex-col items-start gap-1 text-left overflow-hidden min-h-0",
                       isToday ? "border-brand-soft-gold bg-brand-soft-gold/5" : "border-transparent bg-white shadow-sm hover:shadow-md hover:border-brand-light-gray",
                       dayEvents.length > 0 ? "bg-brand-pine-green/5" : ""
                     )}
                   >
-                    <span className={cn("text-sm md:text-lg font-bold", isToday ? "text-brand-soft-gold" : "text-brand-nordic-blue")}>
+                    <span className={cn("text-xs md:text-sm font-bold", isToday ? "text-brand-soft-gold" : "text-brand-nordic-blue")}>
                       {day}
                     </span>
-                    <div className="w-full space-y-1 overflow-hidden">
+                    <div className="w-full space-y-0.5 overflow-hidden">
                       {dayEvents.map(e => (
-                        <div key={e.id} className="text-[8px] md:text-[10px] bg-brand-pine-green text-white px-1 md:px-2 py-0.5 md:py-1 rounded md:rounded-lg truncate w-full">
+                        <div key={e.id} className="text-[8px] md:text-[9px] bg-brand-pine-green text-white px-1 py-0.5 rounded md:rounded-md truncate w-full leading-tight">
                           {e.manager_name || 'Sin nombre'}
                         </div>
                       ))}
@@ -499,27 +499,27 @@ export default function AdminPage() {
                 );
               })}
             </div>
-          </>
+          </div>
         )}
 
         {view === 'dashboard' && (
-          <div className="space-y-6">
-            <div className="grid md:grid-cols-3 gap-6">
-              <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-brand-light-gray/20">
-                <p className="text-xs font-bold uppercase tracking-widest text-brand-nordic-blue/40 mb-2">Ingresos Totales</p>
-                <p className="text-3xl font-black text-brand-nordic-blue">
+          <div className="flex-1 flex flex-col min-h-0 space-y-4 overflow-hidden">
+            <div className="grid grid-cols-3 gap-4 shrink-0">
+              <div className="bg-white p-4 rounded-2xl shadow-sm border border-brand-light-gray/20">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-brand-nordic-blue/40 mb-1">Ingresos</p>
+                <p className="text-lg font-black text-brand-nordic-blue">
                   ${events.reduce((sum, e) => sum + (e.agreed_price || 0), 0).toLocaleString()}
                 </p>
               </div>
-              <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-brand-light-gray/20">
-                <p className="text-xs font-bold uppercase tracking-widest text-brand-nordic-blue/40 mb-2">Gastos Totales</p>
-                <p className="text-3xl font-black text-red-400">
+              <div className="bg-white p-4 rounded-2xl shadow-sm border border-brand-light-gray/20">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-brand-nordic-blue/40 mb-1">Gastos</p>
+                <p className="text-lg font-black text-red-400">
                   ${events.reduce((sum, e) => sum + (e.expenses || []).reduce((s, ex) => s + ex.total, 0), 0).toLocaleString()}
                 </p>
               </div>
-              <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-brand-light-gray/20">
-                <p className="text-xs font-bold uppercase tracking-widest text-brand-nordic-blue/40 mb-2">Rentabilidad Promedio</p>
-                <p className="text-3xl font-black text-green-400">
+              <div className="bg-white p-4 rounded-2xl shadow-sm border border-brand-light-gray/20">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-brand-nordic-blue/40 mb-1">Rentabilidad</p>
+                <p className="text-lg font-black text-green-400">
                   {events.length > 0 
                     ? Math.round((totalCashFlow / events.reduce((sum, e) => sum + (e.agreed_price || 1), 0)) * 100) 
                     : 0}%
@@ -527,20 +527,20 @@ export default function AdminPage() {
               </div>
             </div>
 
-            <div className="bg-white rounded-[2rem] shadow-sm border border-brand-light-gray/20 overflow-hidden">
-              <div className="p-6 border-b border-brand-light-gray/20 flex justify-between items-center">
-                <h3 className="font-bold text-xl">Desglose por Evento</h3>
-                <div className="text-sm text-brand-nordic-blue/60">{events.length} eventos registrados</div>
+            <div className="flex-1 bg-white rounded-[2rem] shadow-sm border border-brand-light-gray/20 overflow-hidden flex flex-col min-h-0">
+              <div className="px-6 py-4 border-b border-brand-light-gray/20 flex justify-between items-center shrink-0">
+                <h3 className="font-bold text-xl text-brand-nordic-blue">Desglose por Evento</h3>
+                <div className="text-xs font-bold text-brand-nordic-blue/40 uppercase tracking-widest">{events.length} eventos</div>
               </div>
-              <div className="overflow-x-auto">
-                <table className="w-full text-left">
-                  <thead className="bg-brand-light-gray/10 text-[10px] uppercase font-bold tracking-widest text-brand-nordic-blue/40">
+              <div className="flex-1 overflow-y-auto custom-scrollbar">
+                <table className="w-full text-left border-collapse">
+                  <thead className="bg-brand-light-gray/5 text-[10px] uppercase font-bold tracking-[0.2em] text-brand-nordic-blue/40 sticky top-0 z-10 backdrop-blur-md">
                     <tr>
-                      <th className="px-6 py-4">Fecha</th>
-                      <th className="px-6 py-4">Evento / Lugar</th>
-                      <th className="px-6 py-4">Ingreso</th>
-                      <th className="px-6 py-4">Gastos</th>
-                      <th className="px-6 py-4">Ganancia</th>
+                      <th className="px-8 py-5">Fecha</th>
+                      <th className="px-8 py-5">Evento / Lugar</th>
+                      <th className="px-8 py-5">Ingreso</th>
+                      <th className="px-8 py-5">Gastos</th>
+                      <th className="px-8 py-5">Ganancia</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-brand-light-gray/10">
@@ -548,16 +548,28 @@ export default function AdminPage() {
                       const expensesTotal = (event.expenses || []).reduce((sum, exp) => sum + exp.total, 0);
                       const profit = (event.agreed_price || 0) - expensesTotal;
                       return (
-                        <tr key={event.id} className="hover:bg-brand-light-gray/5 transition-all">
-                          <td className="px-6 py-4 font-medium">{event.date}</td>
-                          <td className="px-6 py-4">
-                            <div className="font-bold">{event.manager_name}</div>
-                            <div className="text-xs opacity-60">{event.venue_name}</div>
+                        <tr 
+                          key={event.id} 
+                          className="hover:bg-brand-light-gray/5 transition-all cursor-pointer group" 
+                          onClick={() => {
+                            setSelectedEvent(event);
+                            setIsModalOpen(true);
+                          }}
+                        >
+                          <td className="px-8 py-6 font-medium text-sm whitespace-nowrap">{event.date}</td>
+                          <td className="px-8 py-6">
+                            <div className="font-bold text-base text-brand-nordic-blue group-hover:text-brand-soft-gold transition-colors">{event.manager_name}</div>
+                            <div className="text-xs opacity-50 font-medium">{event.venue_name}</div>
                           </td>
-                          <td className="px-6 py-4">${event.agreed_price?.toLocaleString()}</td>
-                          <td className="px-6 py-4 text-red-400">${expensesTotal.toLocaleString()}</td>
-                          <td className={cn("px-6 py-4 font-bold", profit >= 0 ? "text-green-500" : "text-red-500")}>
-                            ${profit.toLocaleString()}
+                          <td className="px-8 py-6 font-bold text-base">${event.agreed_price?.toLocaleString()}</td>
+                          <td className="px-8 py-6 text-red-400 font-bold text-base">${expensesTotal.toLocaleString()}</td>
+                          <td className="px-8 py-6">
+                            <span className={cn(
+                              "px-4 py-2 rounded-xl font-black text-base",
+                              profit >= 0 ? "text-green-500 bg-green-50" : "text-red-500 bg-red-50"
+                            )}>
+                              ${profit.toLocaleString()}
+                            </span>
                           </td>
                         </tr>
                       );
