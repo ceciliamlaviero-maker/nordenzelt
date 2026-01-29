@@ -167,7 +167,7 @@ export default function Home() {
               <div className="mt-14 pt-8 border-t border-brand-light-gray">
                 <p className="text-sm italic text-brand-nordic-blue/70 font-medium flex items-center gap-3">
                   <span className="h-2.5 w-2.5 bg-brand-soft-gold rounded-full"></span>
-                  Capacidad adaptable hasta 300 personas
+                  Capacidad adaptable entre 60 a 400 personas
                 </p>
               </div>
             </div>
@@ -182,10 +182,14 @@ export default function Home() {
                 </p>
                 <p className="flex items-center gap-5 leading-relaxed">
                   <span className="w-3 h-3 bg-brand-soft-gold rounded-full flex-shrink-0"></span>
+                  Modulable de 6 metros x 12 Escalables
+                </p>
+                <p className="flex items-center gap-5 leading-relaxed">
+                  <span className="w-3 h-3 bg-brand-soft-gold rounded-full flex-shrink-0"></span>
                   Diseño adaptable a cualquier terreno y clima
                 </p>
                 <p className="flex items-center gap-3 text-sm mt-12 italic text-brand-soft-gold font-medium">
-                  * Próximamente: Ficha técnica detallada de la carpa.
+                  * Para eventos entre 60 a 400 personas.
                 </p>
               </div>
             </div>
