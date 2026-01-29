@@ -56,6 +56,14 @@ interface SiteAsset {
   display_order: number;
 }
 
+interface SiteContent {
+  id: string;
+  section: string;
+  key: string;
+  value: string;
+  label: string;
+}
+
 // --- Helper Functions ---
 const getDaysInMonth = (year: number, month: number) => {
   return new Date(year, month + 1, 0).getDate();
@@ -75,11 +83,12 @@ export default function AdminPage() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [events, setEvents] = useState<Event[]>([]);
   const [assets, setAssets] = useState<SiteAsset[]>([]);
+  const [siteContent, setSiteContent] = useState<SiteContent[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<Partial<Event> | null>(null);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [view, setView] = useState<'selection' | 'calendar' | 'dashboard' | 'multimedia'>('selection');
+  const [view, setView] = useState<'selection' | 'calendar' | 'dashboard' | 'multimedia' | 'textos'>('selection');
 
   // Auth check
   const handleLogin = (e: React.FormEvent) => {
@@ -126,10 +135,41 @@ export default function AdminPage() {
     }
   };
 
+  const fetchSiteContent = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('site_content')
+        .select('*')
+        .order('section', { ascending: true });
+      if (error) throw error;
+      setSiteContent(data || []);
+    } catch (error) {
+      console.error('Error fetching site content:', error);
+    }
+  };
+
+  const updateSiteContent = async (id: string, value: string) => {
+    setLoading(true);
+    try {
+      const { error } = await supabase
+        .from('site_content')
+        .update({ value })
+        .eq('id', id);
+      if (error) throw error;
+      await fetchSiteContent();
+    } catch (error: any) {
+      console.error("Error updating content:", error);
+      alert("Error al actualizar el texto");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (isAuthenticated) {
       fetchEvents();
       fetchAssets();
+      fetchSiteContent();
     }
   }, [isAuthenticated]);
 
@@ -497,6 +537,19 @@ export default function AdminPage() {
                 <p className="text-sm text-brand-nordic-blue/60">Gestiona las imágenes de toda la plataforma</p>
               </div>
             </button>
+
+            <button 
+              onClick={() => setView('textos')}
+              className="bg-white p-8 rounded-[2rem] shadow-xl hover:shadow-2xl transition-all group flex flex-col items-center gap-6 border-2 border-transparent hover:border-brand-soft-gold"
+            >
+              <div className="bg-brand-soft-gold/10 p-6 rounded-full group-hover:bg-brand-soft-gold/20 transition-all">
+                <MessageCircle size={40} className="text-brand-soft-gold" />
+              </div>
+              <div className="text-center">
+                <h3 className="text-xl font-bold mb-2">Textos Web</h3>
+                <p className="text-sm text-brand-nordic-blue/60">Edita todos los títulos y descripciones de la página</p>
+              </div>
+            </button>
           </div>
         )}
 
@@ -560,6 +613,55 @@ export default function AdminPage() {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        )}
+
+        {view === 'textos' && (
+          <div className="flex-1 flex flex-col min-h-0 space-y-6 overflow-hidden pb-4">
+            <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-brand-light-gray/20">
+              <h3 className="text-2xl font-bold text-brand-nordic-blue mb-2">Gestión de Textos</h3>
+              <p className="text-sm text-brand-nordic-blue/60">Modifica cualquier texto de la web. Los cambios son instantáneos.</p>
+            </div>
+
+            <div className="flex-1 overflow-y-auto custom-scrollbar space-y-6 pr-2">
+              {Object.entries(
+                siteContent.reduce((acc, item) => {
+                  if (!acc[item.section]) acc[item.section] = [];
+                  acc[item.section].push(item);
+                  return acc;
+                }, {} as Record<string, SiteContent[]>)
+              ).map(([section, items]) => (
+                <div key={section} className="bg-white p-6 rounded-[2rem] shadow-sm border border-brand-light-gray/20 space-y-4">
+                  <h4 className="font-bold text-lg text-brand-nordic-blue capitalize border-b pb-2">{section}</h4>
+                  <div className="space-y-4">
+                    {items.map(item => (
+                      <div key={item.id} className="space-y-1">
+                        <label className="text-xs font-bold text-brand-nordic-blue/50 uppercase tracking-wider">{item.label}</label>
+                        <div className="flex gap-2">
+                          <textarea 
+                            className="flex-1 p-3 rounded-xl border border-brand-light-gray/40 focus:outline-none focus:ring-2 focus:ring-brand-soft-gold text-sm bg-brand-light-gray/5 min-h-[80px]"
+                            defaultValue={item.value}
+                            onBlur={(e) => {
+                              if (e.target.value !== item.value) {
+                                updateSiteContent(item.id, e.target.value);
+                              }
+                            }}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+              {siteContent.length === 0 && (
+                <div className="py-20 text-center bg-white rounded-[2rem] border-2 border-dashed border-brand-light-gray/20">
+                  <p className="text-brand-nordic-blue/40 font-medium italic">
+                    No hay textos configurados en la base de datos.<br/>
+                    Ejecuta el SQL proporcionado para empezar.
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         )}

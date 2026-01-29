@@ -11,6 +11,11 @@ interface SiteAsset {
   section: string;
 }
 
+interface SiteContent {
+  key: string;
+  value: string;
+}
+
 interface FormData {
   nombreApellido: string;
   email: string;
@@ -29,17 +34,29 @@ interface FormData {
 export default function Home() {
   const { register, handleSubmit, watch, formState: { errors } } = useForm<FormData>();
   const [assets, setAssets] = useState<SiteAsset[]>([]);
+  const [content, setContent] = useState<SiteContent[]>([]);
 
   useEffect(() => {
-    const fetchAssets = async () => {
-      const { data } = await supabase
+    const fetchData = async () => {
+      // Fetch Assets
+      const { data: assetData } = await supabase
         .from('site_assets')
         .select('url, section')
         .order('display_order', { ascending: true });
-      if (data) setAssets(data);
+      if (assetData) setAssets(assetData);
+
+      // Fetch Content
+      const { data: contentData } = await supabase
+        .from('site_content')
+        .select('key, value');
+      if (contentData) setContent(contentData);
     };
-    fetchAssets();
+    fetchData();
   }, []);
+
+  const getContent = (key: string, fallback: string) => {
+    return content.find(c => c.key === key)?.value || fallback;
+  };
 
   const heroImage = assets.find(a => a.section === 'hero')?.url || "/images/WhatsApp Image 2026-01-16 at 11.50.25 (1).jpeg";
   const carouselImages = assets.filter(a => a.section === 'carousel').map(a => a.url);
@@ -93,7 +110,7 @@ export default function Home() {
           <div className="h-[2px] w-32 md:w-64 bg-brand-soft-gold animate-fade-in"></div>
           
           <p className="text-2xl md:text-5xl text-brand-white italic animate-fade-in font-serif px-4 leading-relaxed">
-            Carpas Exclusivas para Momentos Inolvidables
+            {getContent('hero_subtitle', 'Carpas Exclusivas para Momentos Inolvidables')}
           </p>
         </div>
 
@@ -101,7 +118,7 @@ export default function Home() {
           onClick={() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })}
           className="absolute bottom-10 left-1/2 -translate-x-1/2 text-white flex flex-col items-center gap-3 transition-all hover:text-brand-soft-gold animate-bounce z-20"
         >
-          <span className="font-sans text-[10px] uppercase tracking-[0.4em] font-bold">Explorar</span>
+          <span className="font-sans text-[10px] uppercase tracking-[0.4em] font-bold">{getContent('hero_explore_btn', 'Explorar')}</span>
           <ChevronDown size={24} strokeWidth={2} />
         </button>
       </section>
@@ -113,7 +130,7 @@ export default function Home() {
           {/* Slogan Section - Title removed as requested */}
           <div className="mb-24 text-center">
             <h2 className="font-cinzel italic text-3xl md:text-5xl text-brand-pine-green mb-12 tracking-wide leading-tight">
-              &quot;Una carpa que se adapta a cualquier Entorno&quot;
+              &quot;{getContent('slogan_text', 'Una carpa que se adapta a cualquier Entorno')}&quot;
             </h2>
             
             <div className="max-w-4xl mx-auto shadow-2xl rounded-3xl overflow-hidden border-4 border-brand-soft-gold/20">
@@ -124,7 +141,7 @@ export default function Home() {
           {/* 1. Header Text */}
           <div className="text-center max-w-4xl mx-auto mb-20 space-y-6">
             <h2 className="font-cinzel text-3xl md:text-5xl text-brand-pine-green leading-tight">
-              ¡Comentanos sobre tu evento y armamos un presupuesto a tu medida!
+              {getContent('form_title', '¡Comentanos sobre tu evento y armamos un presupuesto a tu medida!')}
             </h2>
             <div className="h-1.5 w-24 bg-brand-soft-gold mx-auto"></div>
           </div>
@@ -134,14 +151,17 @@ export default function Home() {
             {/* Left Section - Services */}
             <div className="flex-[1.2] bg-brand-white p-8 md:p-14 flex flex-col justify-between">
               <div>
-                <h3 className="font-cinzel text-3xl mb-6 text-brand-pine-green tracking-wide">Nuestro Servicio Incluye:</h3>
+                <h3 className="font-cinzel text-3xl mb-6 text-brand-pine-green tracking-wide">{getContent('services_title', 'Nuestro Servicio Incluye:')}</h3>
                 <div className="h-px w-full bg-brand-soft-gold/30 mb-8"></div>
                 
                 <div className="space-y-10">
                   <div>
-                    <p className="text-[10px] uppercase tracking-[0.2em] text-brand-nordic-blue/60 font-bold mb-5">Servicios Base</p>
+                    <p className="text-[10px] uppercase tracking-[0.2em] text-brand-nordic-blue/60 font-bold mb-5">{getContent('base_services_label', 'Servicios Base')}</p>
                     <ul className="grid grid-cols-1 gap-y-4 font-sans text-brand-nordic-blue">
-                      {['Traslado al punto de armado', 'Armado y Desarmado profesional'].map((item, i) => (
+                      {[
+                        getContent('service_base_1', 'Traslado al punto de armado'),
+                        getContent('service_base_2', 'Armado y Desarmado profesional')
+                      ].map((item, i) => (
                         <li key={i} className="flex items-center gap-4 text-sm md:text-base font-bold">
                           <span className="h-2.5 w-2.5 rounded-full bg-brand-pine-green flex-shrink-0"></span>
                           {item}
@@ -151,9 +171,14 @@ export default function Home() {
                   </div>
 
                   <div>
-                    <p className="text-[10px] uppercase tracking-[0.2em] text-brand-nordic-blue/60 font-bold mb-5">Adicionales Opcionales</p>
+                    <p className="text-[10px] uppercase tracking-[0.2em] text-brand-nordic-blue/60 font-bold mb-5">{getContent('optional_services_label', 'Adicionales Opcionales')}</p>
                     <ul className="grid grid-cols-2 gap-x-6 gap-y-4 font-sans text-brand-nordic-blue">
-                      {['Ambientación', 'Sonido y Técnica', 'Livings y Sillas', 'Pista de baile'].map((item, i) => (
+                      {[
+                        getContent('service_opt_1', 'Ambientación'),
+                        getContent('service_opt_2', 'Sonido y Técnica'),
+                        getContent('service_opt_3', 'Livings y Sillas'),
+                        getContent('service_opt_4', 'Pista de baile')
+                      ].map((item, i) => (
                         <li key={i} className="flex items-center gap-3 text-xs md:text-sm font-medium opacity-70">
                           <span className="h-2 w-2 rounded-full bg-brand-soft-gold flex-shrink-0"></span>
                           {item}
@@ -167,26 +192,26 @@ export default function Home() {
               <div className="mt-14 pt-8 border-t border-brand-light-gray">
                 <p className="text-sm italic text-brand-nordic-blue/70 font-medium flex items-center gap-3">
                   <span className="h-2.5 w-2.5 bg-brand-soft-gold rounded-full"></span>
-                  Capacidad adaptable entre 60 a 400 personas
+                  {getContent('capacity_text', 'Capacidad adaptable entre 60 a 400 personas')}
                 </p>
               </div>
             </div>
 
             {/* Right Section - Technical Specs */}
             <div className="flex-1 bg-brand-pine-green text-brand-white p-8 md:p-14 flex flex-col justify-center">
-              <h3 className="font-cinzel text-4xl mb-8 tracking-wide italic">Especificaciones Técnicas</h3>
+              <h3 className="font-cinzel text-4xl mb-8 tracking-wide italic">{getContent('tech_specs_title', 'Especificaciones Técnicas')}</h3>
               <div className="space-y-8 font-sans text-xl">
                 <p className="flex items-center gap-5 leading-relaxed">
                   <span className="w-3 h-3 bg-brand-soft-gold rounded-full flex-shrink-0"></span>
-                  Materiales de alta resistencia y durabilidad
+                  {getContent('tech_spec_1', 'Materiales de alta resistencia y durabilidad')}
                 </p>
                 <p className="flex items-center gap-5 leading-relaxed">
                   <span className="w-3 h-3 bg-brand-soft-gold rounded-full flex-shrink-0"></span>
-                  Modulable de 6 metros x 12 metros. escalables
+                  {getContent('tech_spec_2', 'Modulable de 6 metros x 12 metros. escalables')}
                 </p>
                 <p className="flex items-center gap-5 leading-relaxed">
                   <span className="w-3 h-3 bg-brand-soft-gold rounded-full flex-shrink-0"></span>
-                  Diseño adaptable a cualquier terreno y clima
+                  {getContent('tech_spec_3', 'Diseño adaptable a cualquier terreno y clima')}
                 </p>
               </div>
             </div>
@@ -307,37 +332,36 @@ export default function Home() {
           <div className="space-y-8">
             <h3 className="font-cinzel text-3xl tracking-widest text-brand-white">NORDEN<br/><span className="text-brand-soft-gold">ZELT</span></h3>
             <p className="font-sans text-sm leading-relaxed opacity-80 max-w-xs">
-              Especialistas Carpas para eventos sociales y corporativos de alto nivel.
+              {getContent('footer_desc', 'Especialistas Carpas para eventos sociales y corporativos de alto nivel.')}
             </p>
           </div>
           
           <div className="space-y-8">
-            <h4 className="font-cinzel text-sm tracking-[0.2em] text-brand-soft-gold uppercase font-bold">Contacto</h4>
+            <h4 className="font-cinzel text-sm tracking-[0.2em] text-brand-soft-gold uppercase font-bold">{getContent('footer_contact_label', 'Contacto')}</h4>
             <div className="space-y-4">
               <a href="https://instagram.com" target="_blank" className="flex items-center gap-4 hover:text-brand-soft-gold transition-colors group">
                 <div className="w-10 h-10 rounded-full border border-brand-soft-gold/20 flex items-center justify-center group-hover:border-brand-soft-gold/50">
                   <Instagram size={18} />
                 </div>
-                <span className="text-sm font-medium tracking-wide">@nordenzelt</span>
+                <span className="text-sm font-medium tracking-wide">{getContent('contact_ig', '@nordenzelt')}</span>
               </a>
               <div className="flex items-center gap-4 group">
                 <div className="w-10 h-10 rounded-full border border-brand-soft-gold/20 flex items-center justify-center">
                   <Mail size={18} />
                 </div>
-                <span className="text-sm font-medium tracking-wide">contacto@nordenzelt.com</span>
+                <span className="text-sm font-medium tracking-wide">{getContent('contact_email', 'contacto@nordenzelt.com')}</span>
               </div>
             </div>
           </div>
 
           <div className="space-y-8">
-            <h4 className="font-cinzel text-sm tracking-[0.2em] text-brand-soft-gold uppercase font-bold">Ubicación</h4>
+            <h4 className="font-cinzel text-sm tracking-[0.2em] text-brand-soft-gold uppercase font-bold">{getContent('footer_location_label', 'Ubicación')}</h4>
             <div className="flex items-start gap-4">
               <div className="w-10 h-10 rounded-full border border-brand-soft-gold/20 flex items-center justify-center flex-shrink-0">
                 <MapPin size={18} />
               </div>
               <p className="text-sm font-medium leading-relaxed">
-                Buenos Aires, Argentina<br/>
-                Servicio de cobertura nacional
+                {getContent('location_text', 'Buenos Aires, Argentina\nServicio de cobertura nacional')}
               </p>
             </div>
           </div>
