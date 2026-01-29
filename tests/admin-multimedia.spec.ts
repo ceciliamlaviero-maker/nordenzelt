@@ -21,10 +21,14 @@ test.describe('Admin Multimedia Management', () => {
     await expect(page.locator('h3')).toContainText('Gestor Multimedia');
     
     // Check if sections are present
-    const sections = ['Portada (Hero)', 'Carrusel de Fotos', 'Servicios', 'Nosotros'];
+    const sections = ['Portada (Hero)', 'Carrusel de Fotos'];
     for (const section of sections) {
       await expect(page.locator(`h4:has-text("${section}")`)).toBeVisible();
     }
+    
+    // Ensure old sections are gone
+    await expect(page.locator('h4:has-text("Servicios")')).not.toBeVisible();
+    await expect(page.locator('h4:has-text("Nosotros")')).not.toBeVisible();
   });
 
   test('should show empty state if no assets are present', async ({ page }) => {

@@ -257,8 +257,8 @@ export default function Home() {
 
                 <div className="grid md:grid-cols-2 gap-8">
                   <div className="space-y-2">
-                    <label className="text-[10px] uppercase tracking-[0.2em] text-brand-nordic-blue/70 font-bold">Cantidad de Personas (Máx 300)*</label>
-                    <input {...register("invitados", { required: true, max: 300 })} type="number" placeholder="100" className="w-full py-2 border-b-2 border-brand-light-gray focus:border-brand-soft-gold outline-none transition-all bg-transparent text-brand-nordic-blue font-medium" />
+                    <label className="text-[10px] uppercase tracking-[0.2em] text-brand-nordic-blue/70 font-bold">Cantidad de Personas (Máx 400)*</label>
+                    <input {...register("invitados", { required: true, max: 400 })} type="number" placeholder="100" className="w-full py-2 border-b-2 border-brand-light-gray focus:border-brand-soft-gold outline-none transition-all bg-transparent text-brand-nordic-blue font-medium" />
                   </div>
                   <div className="space-y-4">
                     <p className="font-cinzel text-[10px] tracking-wider text-brand-nordic-blue font-bold uppercase">¿Ambientación para presentación?</p>

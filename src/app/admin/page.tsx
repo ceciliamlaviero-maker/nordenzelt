@@ -64,6 +64,13 @@ interface SiteContent {
   label: string;
 }
 
+interface SiteService {
+  id: string;
+  type: 'base' | 'optional';
+  text: string;
+  display_order: number;
+}
+
 // --- Helper Functions ---
 const getDaysInMonth = (year: number, month: number) => {
   return new Date(year, month + 1, 0).getDate();
