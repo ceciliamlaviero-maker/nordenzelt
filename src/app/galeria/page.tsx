@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { ChevronLeft, Play } from 'lucide-react';
+import { ChevronLeft, Play, X } from 'lucide-react';
 import Link from 'next/link';
 
 interface GalleryFolder {
@@ -25,6 +25,7 @@ export default function GalleryPage() {
   const [folders, setFolders] = useState<GalleryFolder[]>([]);
   const [activeFolderId, setActiveFolderId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -46,6 +47,18 @@ export default function GalleryPage() {
     };
     fetchData();
   }, []);
+
+  // Prevent scroll when modal is open
+  useEffect(() => {
+    if (selectedImage) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [selectedImage]);
 
   const filteredItems = items.filter(item => 
     item.folder_id === activeFolderId
@@ -103,7 +116,10 @@ export default function GalleryPage() {
                   key={item.id} 
                   className="group bg-white rounded-[2rem] overflow-hidden shadow-2xl border border-brand-light-gray transition-all hover:-translate-y-2"
                 >
-                  <div className="aspect-[4/3] relative bg-brand-pine-green/5 overflow-hidden">
+                  <div 
+                    className={`aspect-[4/3] relative bg-brand-pine-green/5 overflow-hidden ${item.type === 'image' ? 'cursor-zoom-in' : ''}`}
+                    onClick={() => item.type === 'image' && setSelectedImage(item.url)}
+                  >
                     {item.type === 'image' ? (
                       <img 
                         src={item.url} 
@@ -154,6 +170,33 @@ export default function GalleryPage() {
           )}
         </div>
       </section>
+
+      {/* Lightbox Modal */}
+      {selectedImage && (
+        <div 
+          className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-4 md:p-12 animate-in fade-in duration-300"
+          onClick={() => setSelectedImage(null)}
+        >
+          <button 
+            className="absolute top-8 right-8 text-white/70 hover:text-white transition-colors z-50 p-2"
+            onClick={(e) => {
+              e.stopPropagation();
+              setSelectedImage(null);
+            }}
+          >
+            <X size={40} strokeWidth={1.5} />
+          </button>
+          
+          <div className="relative w-full h-full flex items-center justify-center">
+            <img 
+              src={selectedImage} 
+              alt="Galería Norden Fullscreen" 
+              className="max-w-full max-h-full object-contain shadow-2xl animate-in zoom-in-95 duration-300"
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
+        </div>
+      )}
 
       {/* Footer simple for Gallery */}
       <footer className="py-12 bg-brand-pine-green text-white text-center border-t-4 border-brand-soft-gold">
