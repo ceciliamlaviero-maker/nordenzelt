@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { Instagram, Mail, MessageCircle, MapPin, ChevronDown } from 'lucide-react';
 import ImageCarousel from '@/components/ImageCarousel';
@@ -136,6 +137,17 @@ export default function Home() {
             <div className="max-w-4xl mx-auto shadow-2xl rounded-3xl overflow-hidden border-4 border-brand-soft-gold/20">
               <ImageCarousel images={carouselImages} />
             </div>
+
+            {/* Gallery CTA */}
+            <div className="mt-12 flex justify-center">
+              <Link 
+                href="/galeria" 
+                className="inline-flex items-center gap-3 px-10 py-4 bg-brand-pine-green text-brand-white rounded-full font-cinzel tracking-[0.2em] text-sm hover:bg-brand-soft-gold hover:text-brand-nordic-blue transition-all shadow-xl group"
+              >
+                {getContent('gallery_cta_btn', 'EXPLORAR GALERÍA')}
+                <ChevronDown className="-rotate-90 group-hover:translate-x-1 transition-transform" size={18} />
+              </Link>
+            </div>
           </div>
 
           {/* 1. Header Text */}
@@ -163,7 +175,7 @@ export default function Home() {
                         getContent('service_base_2', 'Armado y Desarmado profesional')
                       ].map((item, i) => (
                         <li key={i} className="flex items-center gap-4 text-sm md:text-base font-bold">
-                          <span className="h-2.5 w-2.5 rounded-full bg-brand-pine-green flex-shrink-0"></span>
+                          <span className="h-2.5 w-2.5 rounded-full bg-brand-soft-gold flex-shrink-0"></span>
                           {item}
                         </li>
                       ))}
@@ -180,7 +192,7 @@ export default function Home() {
                         getContent('service_opt_4', 'Pista de baile')
                       ].map((item, i) => (
                         <li key={i} className="flex items-center gap-3 text-sm font-medium opacity-70">
-                          <span className="h-2 w-2 rounded-full bg-brand-soft-gold flex-shrink-0"></span>
+                          <span className="h-2.5 w-2.5 rounded-full bg-brand-soft-gold flex-shrink-0"></span>
                           {item}
                         </li>
                       ))}
@@ -199,18 +211,20 @@ export default function Home() {
 
             {/* Right Section - Technical Specs */}
             <div className="flex-1 bg-brand-pine-green text-brand-white p-8 md:p-14 flex flex-col justify-center">
-              <h3 className="font-cinzel text-4xl mb-8 tracking-wide italic">{getContent('tech_specs_title', 'Especificaciones Técnicas')}</h3>
+              <h3 className="font-cinzel text-3xl mb-6 tracking-wide italic">{getContent('tech_specs_title', 'Especificaciones Técnicas')}</h3>
+              <div className="h-px w-full bg-brand-soft-gold/30 mb-8"></div>
+
               <div className="space-y-8 font-sans text-xl">
                 <p className="flex items-center gap-5 leading-relaxed">
-                  <span className="w-3 h-3 bg-brand-soft-gold rounded-full flex-shrink-0"></span>
+                  <span className="w-2.5 h-2.5 bg-brand-soft-gold rounded-full flex-shrink-0"></span>
                   {getContent('tech_spec_1', 'Materiales de alta resistencia y durabilidad')}
                 </p>
                 <p className="flex items-center gap-5 leading-relaxed">
-                  <span className="w-3 h-3 bg-brand-soft-gold rounded-full flex-shrink-0"></span>
+                  <span className="w-2.5 h-2.5 bg-brand-soft-gold rounded-full flex-shrink-0"></span>
                   {getContent('tech_spec_2', 'Modulable de 6 metros x 12 metros. escalables')}
                 </p>
                 <p className="flex items-center gap-5 leading-relaxed">
-                  <span className="w-3 h-3 bg-brand-soft-gold rounded-full flex-shrink-0"></span>
+                  <span className="w-2.5 h-2.5 bg-brand-soft-gold rounded-full flex-shrink-0"></span>
                   {getContent('tech_spec_3', 'Diseño adaptable a cualquier terreno y clima')}
                 </p>
               </div>
