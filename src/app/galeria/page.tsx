@@ -114,7 +114,7 @@ export default function GalleryPage() {
                     {item.type === 'image' ? (
                       <img 
                         src={item.url} 
-                        alt={item.title} 
+                        alt={item.title || 'Imagen de Galería Norden Zelt'} 
                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                       />
                     ) : (

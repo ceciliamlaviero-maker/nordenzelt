@@ -215,7 +215,11 @@ export default function AdminPage() {
       await fetchGallery();
     } catch (error: any) {
       console.error("Error creating folder:", error);
-      alert("Error al crear carpeta");
+      if (error.code === '42501') {
+        alert("Error de permisos (RLS): Asegúrate de haber ejecutado el SQL de configuración para las carpetas.");
+      } else {
+        alert("Error al crear carpeta: " + (error.message || "Error desconocido"));
+      }
     } finally {
       setLoading(false);
     }

@@ -1,0 +1,315 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - button [ref=e5] [cursor=pointer]:
+          - img [ref=e6]
+        - generic [ref=e8]:
+          - heading "NORDEN ADMIN" [level=1] [ref=e9]
+          - paragraph [ref=e10]: Gestión de Eventos y Finanzas
+      - generic [ref=e11]:
+        - paragraph [ref=e12]: Flujo de Caja Total
+        - paragraph [ref=e13]: $0
+    - main [ref=e14]:
+      - generic [ref=e15]:
+        - generic [ref=e16]:
+          - generic [ref=e17]:
+            - heading "Gestión de Galería" [level=3] [ref=e18]
+            - paragraph [ref=e19]: Organiza fotos y videos en carpetas sectorizadas.
+          - generic [ref=e20]:
+            - button "Nueva Carpeta" [ref=e21] [cursor=pointer]:
+              - img [ref=e22]
+              - text: Nueva Carpeta
+            - generic [ref=e24] [cursor=pointer]:
+              - img [ref=e25]
+              - text: Subir Multimedia
+        - button "Ver Todo" [ref=e29] [cursor=pointer]
+        - generic [ref=e31]:
+          - generic [ref=e32]:
+            - generic [ref=e33]:
+              - img "Nuevo Item" [ref=e34]
+              - button [ref=e35] [cursor=pointer]:
+                - img [ref=e36]
+            - generic [ref=e39]:
+              - generic [ref=e40]:
+                - text: Carpeta
+                - combobox [ref=e41]:
+                  - option "Sin Carpeta" [selected]
+              - generic [ref=e42]:
+                - text: Título
+                - textbox [ref=e43]: Nuevo Item
+              - generic [ref=e44]:
+                - text: Descripción
+                - textbox [ref=e45]
+          - generic [ref=e46]:
+            - generic [ref=e47]:
+              - img "Nuevo Item" [ref=e48]
+              - button [ref=e49] [cursor=pointer]:
+                - img [ref=e50]
+            - generic [ref=e53]:
+              - generic [ref=e54]:
+                - text: Carpeta
+                - combobox [ref=e55]:
+                  - option "Sin Carpeta" [selected]
+              - generic [ref=e56]:
+                - text: Título
+                - textbox [ref=e57]: Nuevo Item
+              - generic [ref=e58]:
+                - text: Descripción
+                - textbox [ref=e59]
+          - generic [ref=e60]:
+            - generic [ref=e61]:
+              - img "Nuevo Item" [ref=e62]
+              - button [ref=e63] [cursor=pointer]:
+                - img [ref=e64]
+            - generic [ref=e67]:
+              - generic [ref=e68]:
+                - text: Carpeta
+                - combobox [ref=e69]:
+                  - option "Sin Carpeta" [selected]
+              - generic [ref=e70]:
+                - text: Título
+                - textbox [ref=e71]: Nuevo Item
+              - generic [ref=e72]:
+                - text: Descripción
+                - textbox [ref=e73]
+          - generic [ref=e74]:
+            - generic [ref=e75]:
+              - img "Nuevo Item" [ref=e76]
+              - button [ref=e77] [cursor=pointer]:
+                - img [ref=e78]
+            - generic [ref=e81]:
+              - generic [ref=e82]:
+                - text: Carpeta
+                - combobox [ref=e83]:
+                  - option "Sin Carpeta" [selected]
+              - generic [ref=e84]:
+                - text: Título
+                - textbox [ref=e85]: Nuevo Item
+              - generic [ref=e86]:
+                - text: Descripción
+                - textbox [ref=e87]
+          - generic [ref=e88]:
+            - generic [ref=e89]:
+              - img "Nuevo Item" [ref=e90]
+              - button [ref=e91] [cursor=pointer]:
+                - img [ref=e92]
+            - generic [ref=e95]:
+              - generic [ref=e96]:
+                - text: Carpeta
+                - combobox [ref=e97]:
+                  - option "Sin Carpeta" [selected]
+              - generic [ref=e98]:
+                - text: Título
+                - textbox [ref=e99]: Nuevo Item
+              - generic [ref=e100]:
+                - text: Descripción
+                - textbox [ref=e101]
+          - generic [ref=e102]:
+            - button [ref=e105] [cursor=pointer]:
+              - img [ref=e106]
+            - generic [ref=e109]:
+              - generic [ref=e110]:
+                - text: Carpeta
+                - combobox [ref=e111]:
+                  - option "Sin Carpeta" [selected]
+              - generic [ref=e112]:
+                - text: Título
+                - textbox [ref=e113]: Nuevo Item
+              - generic [ref=e114]:
+                - text: Descripción
+                - textbox [ref=e115]
+          - generic [ref=e116]:
+            - generic [ref=e117]:
+              - img "Nuevo Item" [ref=e118]
+              - button [ref=e119] [cursor=pointer]:
+                - img [ref=e120]
+            - generic [ref=e123]:
+              - generic [ref=e124]:
+                - text: Carpeta
+                - combobox [ref=e125]:
+                  - option "Sin Carpeta" [selected]
+              - generic [ref=e126]:
+                - text: Título
+                - textbox [ref=e127]: Nuevo Item
+              - generic [ref=e128]:
+                - text: Descripción
+                - textbox [ref=e129]
+          - generic [ref=e130]:
+            - generic [ref=e131]:
+              - img "Nuevo Item" [ref=e132]
+              - button [ref=e133] [cursor=pointer]:
+                - img [ref=e134]
+            - generic [ref=e137]:
+              - generic [ref=e138]:
+                - text: Carpeta
+                - combobox [ref=e139]:
+                  - option "Sin Carpeta" [selected]
+              - generic [ref=e140]:
+                - text: Título
+                - textbox [ref=e141]: Nuevo Item
+              - generic [ref=e142]:
+                - text: Descripción
+                - textbox [ref=e143]
+          - generic [ref=e144]:
+            - generic [ref=e145]:
+              - img "Nuevo Item" [ref=e146]
+              - button [ref=e147] [cursor=pointer]:
+                - img [ref=e148]
+            - generic [ref=e151]:
+              - generic [ref=e152]:
+                - text: Carpeta
+                - combobox [ref=e153]:
+                  - option "Sin Carpeta" [selected]
+              - generic [ref=e154]:
+                - text: Título
+                - textbox [ref=e155]: Nuevo Item
+              - generic [ref=e156]:
+                - text: Descripción
+                - textbox [ref=e157]
+          - generic [ref=e158]:
+            - generic [ref=e159]:
+              - img "Nuevo Item" [ref=e160]
+              - button [ref=e161] [cursor=pointer]:
+                - img [ref=e162]
+            - generic [ref=e165]:
+              - generic [ref=e166]:
+                - text: Carpeta
+                - combobox [ref=e167]:
+                  - option "Sin Carpeta" [selected]
+              - generic [ref=e168]:
+                - text: Título
+                - textbox [ref=e169]: Nuevo Item
+              - generic [ref=e170]:
+                - text: Descripción
+                - textbox [ref=e171]
+          - generic [ref=e172]:
+            - generic [ref=e173]:
+              - img "Nuevo Item" [ref=e174]
+              - button [ref=e175] [cursor=pointer]:
+                - img [ref=e176]
+            - generic [ref=e179]:
+              - generic [ref=e180]:
+                - text: Carpeta
+                - combobox [ref=e181]:
+                  - option "Sin Carpeta" [selected]
+              - generic [ref=e182]:
+                - text: Título
+                - textbox [ref=e183]: Nuevo Item
+              - generic [ref=e184]:
+                - text: Descripción
+                - textbox [ref=e185]
+          - generic [ref=e186]:
+            - generic [ref=e187]:
+              - img "Nuevo Item" [ref=e188]
+              - button [ref=e189] [cursor=pointer]:
+                - img [ref=e190]
+            - generic [ref=e193]:
+              - generic [ref=e194]:
+                - text: Carpeta
+                - combobox [ref=e195]:
+                  - option "Sin Carpeta" [selected]
+              - generic [ref=e196]:
+                - text: Título
+                - textbox [ref=e197]: Nuevo Item
+              - generic [ref=e198]:
+                - text: Descripción
+                - textbox [ref=e199]
+          - generic [ref=e200]:
+            - button [ref=e203] [cursor=pointer]:
+              - img [ref=e204]
+            - generic [ref=e207]:
+              - generic [ref=e208]:
+                - text: Carpeta
+                - combobox [ref=e209]:
+                  - option "Sin Carpeta" [selected]
+              - generic [ref=e210]:
+                - text: Título
+                - textbox [ref=e211]: Nuevo Item
+              - generic [ref=e212]:
+                - text: Descripción
+                - textbox [ref=e213]
+          - generic [ref=e214]:
+            - generic [ref=e215]:
+              - img "Nuevo Item" [ref=e216]
+              - button [ref=e217] [cursor=pointer]:
+                - img [ref=e218]
+            - generic [ref=e221]:
+              - generic [ref=e222]:
+                - text: Carpeta
+                - combobox [ref=e223]:
+                  - option "Sin Carpeta" [selected]
+              - generic [ref=e224]:
+                - text: Título
+                - textbox [ref=e225]: Nuevo Item
+              - generic [ref=e226]:
+                - text: Descripción
+                - textbox [ref=e227]
+          - generic [ref=e228]:
+            - generic [ref=e229]:
+              - img "Nuevo Item" [ref=e230]
+              - button [ref=e231] [cursor=pointer]:
+                - img [ref=e232]
+            - generic [ref=e235]:
+              - generic [ref=e236]:
+                - text: Carpeta
+                - combobox [ref=e237]:
+                  - option "Sin Carpeta" [selected]
+              - generic [ref=e238]:
+                - text: Título
+                - textbox [ref=e239]: Nuevo Item
+              - generic [ref=e240]:
+                - text: Descripción
+                - textbox [ref=e241]
+          - generic [ref=e242]:
+            - generic [ref=e243]:
+              - img "Nuevo Item" [ref=e244]
+              - button [ref=e245] [cursor=pointer]:
+                - img [ref=e246]
+            - generic [ref=e249]:
+              - generic [ref=e250]:
+                - text: Carpeta
+                - combobox [ref=e251]:
+                  - option "Sin Carpeta" [selected]
+              - generic [ref=e252]:
+                - text: Título
+                - textbox [ref=e253]: Nuevo Item
+              - generic [ref=e254]:
+                - text: Descripción
+                - textbox [ref=e255]
+          - generic [ref=e256]:
+            - generic [ref=e257]:
+              - img "Nuevo Item" [ref=e258]
+              - button [ref=e259] [cursor=pointer]:
+                - img [ref=e260]
+            - generic [ref=e263]:
+              - generic [ref=e264]:
+                - text: Carpeta
+                - combobox [ref=e265]:
+                  - option "Sin Carpeta" [selected]
+              - generic [ref=e266]:
+                - text: Título
+                - textbox [ref=e267]: Nuevo Item
+              - generic [ref=e268]:
+                - text: Descripción
+                - textbox [ref=e269]
+    - generic [ref=e271]:
+      - generic [ref=e272]:
+        - heading "Nueva Carpeta" [level=3] [ref=e273]:
+          - img [ref=e274]
+          - text: Nueva Carpeta
+        - button [ref=e276] [cursor=pointer]:
+          - img [ref=e277]
+      - generic [ref=e280]:
+        - generic [ref=e281]:
+          - text: Nombre de la Carpeta
+          - 'textbox "Ej: Eventos Corporativos" [ref=e282]': Folder Asignacion
+        - generic [ref=e283]:
+          - text: Descripción (Opcional)
+          - textbox [ref=e284]
+        - button "Crear Carpeta" [ref=e285] [cursor=pointer]
+  - alert [ref=e286]
+```

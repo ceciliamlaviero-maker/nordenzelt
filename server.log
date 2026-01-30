@@ -6,4 +6,9 @@
    - Local:        http://localhost:3000
    - Environments: .env.local
 
- ✓ Ready in 2.5s
+ ✓ Ready in 2.2s
+ ○ Compiling /admin ...
+ ✓ Compiled /admin in 884ms (551 modules)
+ ✓ Compiled /galeria in 305ms (601 modules)
+ ✓ Compiled in 1474ms (615 modules)
+ ✓ Compiled in 446ms (615 modules)
