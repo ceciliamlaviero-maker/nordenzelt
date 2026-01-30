@@ -96,6 +96,8 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [view, setView] = useState<'selection' | 'calendar' | 'dashboard' | 'multimedia' | 'textos'>('selection');
+  const [editingContentId, setEditingContentId] = useState<string | null>(null);
+  const [saveStatus, setSaveStatus] = useState<string | null>(null);
 
   // Auth check
   const handleLogin = (e: React.FormEvent) => {
@@ -157,6 +159,7 @@ export default function AdminPage() {
 
   const updateSiteContent = async (id: string, value: string) => {
     setLoading(true);
+    setSaveStatus(null);
     try {
       const { error } = await supabase
         .from('site_content')
@@ -164,6 +167,10 @@ export default function AdminPage() {
         .eq('id', id);
       if (error) throw error;
       await fetchSiteContent();
+      setSaveStatus(id);
+      setEditingContentId(null);
+      // Clear status after 3 seconds
+      setTimeout(() => setSaveStatus(null), 3000);
     } catch (error: any) {
       console.error("Error updating content:", error);
       alert("Error al actualizar el texto");
@@ -643,18 +650,57 @@ export default function AdminPage() {
                   <h4 className="font-bold text-lg text-brand-nordic-blue capitalize border-b pb-2">{section}</h4>
                   <div className="space-y-4">
                     {items.map(item => (
-                      <div key={item.id} className="space-y-1">
-                        <label className="text-xs font-bold text-brand-nordic-blue/50 uppercase tracking-wider">{item.label}</label>
-                        <div className="flex gap-2">
+                      <div key={item.id} className="space-y-2 p-4 rounded-2xl bg-brand-light-gray/5 border border-brand-light-gray/20">
+                        <div className="flex justify-between items-center">
+                          <label className="text-xs font-bold text-brand-nordic-blue/50 uppercase tracking-wider">{item.label}</label>
+                          {saveStatus === item.id && (
+                            <span className="text-[10px] font-bold text-green-500 animate-bounce flex items-center gap-1">
+                              <Save size={10} /> ¡Guardado con éxito!
+                            </span>
+                          )}
+                        </div>
+                        
+                        <div className="space-y-3">
                           <textarea 
-                            className="flex-1 p-3 rounded-xl border border-brand-light-gray/40 focus:outline-none focus:ring-2 focus:ring-brand-soft-gold text-sm bg-brand-light-gray/5 min-h-[80px]"
+                            id={`textarea-${item.id}`}
+                            className={cn(
+                              "w-full p-4 rounded-xl border transition-all text-sm min-h-[100px] outline-none",
+                              editingContentId === item.id 
+                                ? "border-brand-soft-gold bg-white ring-2 ring-brand-soft-gold/10" 
+                                : "border-brand-light-gray/20 bg-transparent cursor-not-allowed opacity-70"
+                            )}
                             defaultValue={item.value}
-                            onBlur={(e) => {
-                              if (e.target.value !== item.value) {
-                                updateSiteContent(item.id, e.target.value);
-                              }
-                            }}
+                            disabled={editingContentId !== item.id}
                           />
+                          
+                          <div className="flex justify-end gap-2">
+                            {editingContentId === item.id ? (
+                              <>
+                                <button 
+                                  onClick={() => setEditingContentId(null)}
+                                  className="px-4 py-2 rounded-lg text-xs font-bold text-brand-nordic-blue/60 hover:bg-brand-light-gray/20 transition-all"
+                                >
+                                  Cancelar
+                                </button>
+                                <button 
+                                  onClick={() => {
+                                    const el = document.getElementById(`textarea-${item.id}`) as HTMLTextAreaElement;
+                                    updateSiteContent(item.id, el.value);
+                                  }}
+                                  className="px-6 py-2 rounded-lg text-xs font-bold bg-brand-soft-gold text-brand-nordic-blue hover:bg-opacity-80 transition-all flex items-center gap-2"
+                                >
+                                  <Save size={14} /> Guardar Cambios
+                                </button>
+                              </>
+                            ) : (
+                              <button 
+                                onClick={() => setEditingContentId(item.id)}
+                                className="px-6 py-2 rounded-lg text-xs font-bold bg-brand-nordic-blue text-white hover:bg-opacity-90 transition-all flex items-center gap-2"
+                              >
+                                <MessageCircle size={14} /> Editar Texto
+                              </button>
+                            )}
+                          </div>
                         </div>
                       </div>
                     ))}
