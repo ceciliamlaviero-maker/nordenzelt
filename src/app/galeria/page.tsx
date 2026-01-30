@@ -23,7 +23,7 @@ interface GalleryItem {
 export default function GalleryPage() {
   const [items, setItems] = useState<GalleryItem[]>([]);
   const [folders, setFolders] = useState<GalleryFolder[]>([]);
-  const [activeFolderId, setActiveFolderId] = useState<string | 'all'>('all');
+  const [activeFolderId, setActiveFolderId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -38,6 +38,9 @@ export default function GalleryPage() {
       }
       if (!foldersRes.error && foldersRes.data) {
         setFolders(foldersRes.data);
+        if (foldersRes.data.length > 0) {
+          setActiveFolderId(foldersRes.data[0].id);
+        }
       }
       setLoading(false);
     };
@@ -45,7 +48,7 @@ export default function GalleryPage() {
   }, []);
 
   const filteredItems = items.filter(item => 
-    activeFolderId === 'all' || item.folder_id === activeFolderId
+    item.folder_id === activeFolderId
   );
 
   return (
@@ -72,16 +75,6 @@ export default function GalleryPage() {
           {/* Folders Navigation */}
           {!loading && folders.length > 0 && (
             <div className="flex flex-wrap justify-center gap-4 mb-20">
-              <button 
-                onClick={() => setActiveFolderId('all')}
-                className={`px-8 py-3 rounded-full font-cinzel text-xs tracking-widest transition-all ${
-                  activeFolderId === 'all' 
-                  ? 'bg-brand-nordic-blue text-white shadow-xl scale-105' 
-                  : 'bg-white text-brand-nordic-blue/60 hover:bg-brand-soft-gold/20'
-                }`}
-              >
-                TODO
-              </button>
               {folders.map(folder => (
                 <button 
                   key={folder.id}
