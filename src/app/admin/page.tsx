@@ -71,6 +71,16 @@ interface SiteService {
   display_order: number;
 }
 
+interface GalleryItem {
+  id: string;
+  url: string;
+  storage_path: string;
+  type: 'image' | 'video';
+  title: string;
+  description: string;
+  display_order: number;
+}
+
 // --- Helper Functions ---
 const getDaysInMonth = (year: number, month: number) => {
   return new Date(year, month + 1, 0).getDate();
@@ -91,11 +101,12 @@ export default function AdminPage() {
   const [events, setEvents] = useState<Event[]>([]);
   const [assets, setAssets] = useState<SiteAsset[]>([]);
   const [siteContent, setSiteContent] = useState<SiteContent[]>([]);
+  const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<Partial<Event> | null>(null);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [view, setView] = useState<'selection' | 'calendar' | 'dashboard' | 'multimedia' | 'textos'>('selection');
+  const [view, setView] = useState<'selection' | 'calendar' | 'dashboard' | 'multimedia' | 'textos' | 'galeria'>('selection');
   const [editingContentId, setEditingContentId] = useState<string | null>(null);
   const [saveStatus, setSaveStatus] = useState<string | null>(null);
 
@@ -157,6 +168,19 @@ export default function AdminPage() {
     }
   };
 
+  const fetchGallery = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('gallery_content')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      setGalleryItems(data || []);
+    } catch (error) {
+      console.error('Error fetching gallery:', error);
+    }
+  };
+
   const updateSiteContent = async (id: string, value: string) => {
     setLoading(true);
     setSaveStatus(null);
@@ -184,6 +208,7 @@ export default function AdminPage() {
       fetchEvents();
       fetchAssets();
       fetchSiteContent();
+      fetchGallery();
     }
   }, [isAuthenticated]);
 
@@ -225,6 +250,84 @@ export default function AdminPage() {
       setUploading(false);
       // Reset input
       e.target.value = '';
+    }
+  };
+
+  const handleGalleryUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const fileType = file.type.startsWith('video/') ? 'video' : 'image';
+    setUploading(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+      const filePath = `gallery/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('gallery')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('gallery')
+        .getPublicUrl(filePath);
+
+      const { error: dbError } = await supabase
+        .from('gallery_content')
+        .insert([{ 
+          url: publicUrl, 
+          storage_path: filePath, 
+          type: fileType,
+          title: 'Nuevo Item',
+          description: ''
+        }]);
+
+      if (dbError) throw dbError;
+
+      await fetchGallery();
+      alert(`${fileType === 'video' ? 'Video' : 'Imagen'} subida con éxito`);
+    } catch (error: any) {
+      console.error("Error uploading to gallery:", error);
+      alert(`Error al subir: ${error.message}`);
+    } finally {
+      setUploading(false);
+      e.target.value = '';
+    }
+  };
+
+  const updateGalleryItem = async (id: string, updates: Partial<GalleryItem>) => {
+    setLoading(true);
+    try {
+      const { error } = await supabase
+        .from('gallery_content')
+        .update(updates)
+        .eq('id', id);
+      if (error) throw error;
+      setSaveStatus(id);
+      setTimeout(() => setSaveStatus(null), 2000);
+      await fetchGallery();
+    } catch (error: any) {
+      console.error("Error updating gallery item:", error);
+      alert("Error al actualizar");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteGallery = async (item: GalleryItem) => {
+    if (!confirm("¿Estás seguro de eliminar este elemento?")) return;
+    setLoading(true);
+    try {
+      await supabase.storage.from('gallery').remove([item.storage_path]);
+      const { error } = await supabase.from('gallery_content').delete().eq('id', item.id);
+      if (error) throw error;
+      await fetchGallery();
+    } catch (error: any) {
+      console.error("Error deleting gallery item:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -564,6 +667,93 @@ export default function AdminPage() {
                 <p className="text-sm text-brand-nordic-blue/60">Edita todos los títulos y descripciones de la página</p>
               </div>
             </button>
+
+            <button 
+              onClick={() => setView('galeria')}
+              className="bg-white p-8 rounded-[2rem] shadow-xl hover:shadow-2xl transition-all group flex flex-col items-center gap-6 border-2 border-transparent hover:border-brand-soft-gold"
+            >
+              <div className="bg-brand-pine-green/10 p-6 rounded-full group-hover:bg-brand-pine-green/20 transition-all">
+                <ImageIcon size={40} className="text-brand-pine-green" />
+              </div>
+              <div className="text-center">
+                <h3 className="text-xl font-bold mb-2">Galería de Imágenes</h3>
+                <p className="text-sm text-brand-nordic-blue/60">Sube fotos y videos con títulos y descripciones</p>
+              </div>
+            </button>
+          </div>
+        )}
+
+        {view === 'galeria' && (
+          <div className="flex-1 flex flex-col min-h-0 space-y-6 overflow-hidden pb-4">
+            <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-brand-light-gray/20 flex justify-between items-center">
+              <div>
+                <h3 className="text-2xl font-bold text-brand-nordic-blue mb-2">Gestión de Galería</h3>
+                <p className="text-sm text-brand-nordic-blue/60">Sube fotos o videos para la sección de galería.</p>
+              </div>
+              <label className={cn(
+                "flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all cursor-pointer",
+                uploading ? "bg-brand-light-gray text-brand-nordic-blue/40 cursor-not-allowed" : "bg-brand-soft-gold text-brand-nordic-blue hover:bg-opacity-80"
+              )}>
+                {uploading ? <div className="animate-spin rounded-full h-4 w-4 border-2 border-brand-nordic-blue border-t-transparent"></div> : <Upload size={18} />}
+                {uploading ? 'Subiendo...' : 'Subir Multimedia'}
+                <input 
+                  type="file" 
+                  accept="image/*,video/*" 
+                  className="hidden" 
+                  onChange={handleGalleryUpload}
+                  disabled={uploading}
+                />
+              </label>
+            </div>
+
+            <div className="flex-1 overflow-y-auto custom-scrollbar pr-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {galleryItems.map(item => (
+                  <div key={item.id} className="bg-white rounded-[2rem] shadow-sm border border-brand-light-gray/20 overflow-hidden flex flex-col">
+                    <div className="aspect-video relative bg-black flex items-center justify-center">
+                      {item.type === 'image' ? (
+                        <img src={item.url} className="w-full h-full object-cover" alt={item.title} />
+                      ) : (
+                        <video src={item.url} className="w-full h-full object-cover" controls />
+                      )}
+                      <button 
+                        onClick={() => handleDeleteGallery(item)}
+                        className="absolute top-4 right-4 bg-red-500 text-white p-2 rounded-full hover:bg-red-600 transition-colors shadow-lg"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                    <div className="p-6 space-y-4 flex-1 flex flex-col">
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-bold uppercase tracking-widest text-brand-nordic-blue/40">Título</label>
+                        <input 
+                          type="text"
+                          defaultValue={item.title}
+                          onBlur={(e) => updateGalleryItem(item.id, { title: e.target.value })}
+                          className="w-full bg-brand-light-gray/5 border border-brand-light-gray/20 rounded-xl px-4 py-2 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-brand-soft-gold"
+                        />
+                      </div>
+                      <div className="space-y-1 flex-1">
+                        <label className="text-[10px] font-bold uppercase tracking-widest text-brand-nordic-blue/40">Descripción</label>
+                        <textarea 
+                          defaultValue={item.description}
+                          onBlur={(e) => updateGalleryItem(item.id, { description: e.target.value })}
+                          className="w-full bg-brand-light-gray/5 border border-brand-light-gray/20 rounded-xl px-4 py-2 text-sm min-h-[80px] focus:outline-none focus:ring-2 focus:ring-brand-soft-gold"
+                        />
+                      </div>
+                      {saveStatus === item.id && (
+                        <p className="text-[10px] font-bold text-green-500 text-right animate-pulse">¡Cambios guardados!</p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {galleryItems.length === 0 && (
+                <div className="py-20 text-center bg-white rounded-[2rem] border-2 border-dashed border-brand-light-gray/20">
+                  <p className="text-brand-nordic-blue/40 font-medium italic">No hay elementos en la galería todavía.</p>
+                </div>
+              )}
+            </div>
           </div>
         )}
 
