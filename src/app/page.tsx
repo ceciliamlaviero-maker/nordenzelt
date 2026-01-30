@@ -331,9 +331,9 @@ export default function Home() {
                   </div>
                 </div>
 
-                <button type="submit" className="w-full bg-brand-nordic-blue text-brand-white py-6 rounded-2xl font-cinzel tracking-[0.3em] text-lg hover:bg-brand-pine-green transition-all shadow-xl hover:shadow-brand-nordic-blue/20 flex items-center justify-center gap-4 group border-b-4 border-brand-soft-gold">
-                  <MessageCircle className="group-hover:scale-110 transition-transform text-brand-soft-gold" />
-                  SOLICITAR PRESUPUESTO
+                <button type="submit" className="w-full bg-brand-nordic-blue text-brand-white py-4 md:py-6 rounded-2xl font-cinzel tracking-[0.1em] md:tracking-[0.3em] text-sm md:text-lg hover:bg-brand-pine-green transition-all shadow-xl hover:shadow-brand-nordic-blue/20 flex items-center justify-center gap-2 md:gap-4 group border-b-4 border-brand-soft-gold">
+                  <MessageCircle className="group-hover:scale-110 transition-transform text-brand-soft-gold w-5 h-5 md:w-6 md:h-6" />
+                  <span className="whitespace-nowrap">SOLICITAR PRESUPUESTO</span>
                 </button>
             </form>
           </div>
