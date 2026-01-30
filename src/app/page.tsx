@@ -64,7 +64,7 @@ export default function Home() {
   
   const onSubmit = (data: FormData) => {
     const phoneNumber = "5491132747900";
-    const baseMessage = "¡Hola! Me gustaría recibir un presupuesto para el alquiler de una carpa Norden Zelt 😃\n\n";
+    const baseMessage = "¡Hola! Me gustaría recibir un presupuesto para el alquiler de una carpa Norden Zelt\n\n";
     
     let details = `*Datos del Pedido:*\n`;
     details += `- Nombre: ${data.nombreApellido}\n`;
@@ -117,9 +117,9 @@ export default function Home() {
 
         <button 
           onClick={() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })}
-          className="absolute bottom-10 left-1/2 -translate-x-1/2 text-white flex flex-col items-center gap-3 transition-all hover:text-brand-soft-gold animate-bounce z-20"
+          className="absolute bottom-10 inset-x-0 mx-auto w-fit text-white flex flex-col items-center gap-3 transition-all hover:text-brand-soft-gold animate-bounce z-20"
         >
-          <span className="font-sans text-[10px] uppercase tracking-[0.4em] font-bold">{getContent('hero_explore_btn', 'Explorar')}</span>
+          <span className="font-sans text-[10px] uppercase tracking-[0.4em] font-bold mr-[-0.4em]">{getContent('hero_explore_btn', 'Explorar')}</span>
           <ChevronDown size={24} strokeWidth={2} />
         </button>
       </section>
