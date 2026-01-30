@@ -5,32 +5,48 @@ import { supabase } from '@/lib/supabase';
 import { ChevronLeft, Play } from 'lucide-react';
 import Link from 'next/link';
 
+interface GalleryFolder {
+  id: string;
+  name: string;
+  description: string;
+}
+
 interface GalleryItem {
   id: string;
   url: string;
   type: 'image' | 'video';
   title: string;
   description: string;
+  folder_id: string | null;
 }
 
 export default function GalleryPage() {
   const [items, setItems] = useState<GalleryItem[]>([]);
+  const [folders, setFolders] = useState<GalleryFolder[]>([]);
+  const [activeFolderId, setActiveFolderId] = useState<string | 'all'>('all');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchGallery = async () => {
-      const { data, error } = await supabase
-        .from('gallery_content')
-        .select('*')
-        .order('created_at', { ascending: false });
+    const fetchData = async () => {
+      const [galleryRes, foldersRes] = await Promise.all([
+        supabase.from('gallery_content').select('*').order('created_at', { ascending: false }),
+        supabase.from('gallery_folders').select('*').order('name', { ascending: true })
+      ]);
       
-      if (!error && data) {
-        setItems(data);
+      if (!galleryRes.error && galleryRes.data) {
+        setItems(galleryRes.data);
+      }
+      if (!foldersRes.error && foldersRes.data) {
+        setFolders(foldersRes.data);
       }
       setLoading(false);
     };
-    fetchGallery();
+    fetchData();
   }, []);
+
+  const filteredItems = items.filter(item => 
+    activeFolderId === 'all' || item.folder_id === activeFolderId
+  );
 
   return (
     <main className="min-h-screen bg-brand-white text-brand-nordic-blue font-sans">
@@ -53,6 +69,35 @@ export default function GalleryPage() {
 
       <section className="py-20 px-6 md:px-12">
         <div className="max-w-7xl mx-auto">
+          {/* Folders Navigation */}
+          {!loading && folders.length > 0 && (
+            <div className="flex flex-wrap justify-center gap-4 mb-20">
+              <button 
+                onClick={() => setActiveFolderId('all')}
+                className={`px-8 py-3 rounded-full font-cinzel text-xs tracking-widest transition-all ${
+                  activeFolderId === 'all' 
+                  ? 'bg-brand-nordic-blue text-white shadow-xl scale-105' 
+                  : 'bg-white text-brand-nordic-blue/60 hover:bg-brand-soft-gold/20'
+                }`}
+              >
+                TODO
+              </button>
+              {folders.map(folder => (
+                <button 
+                  key={folder.id}
+                  onClick={() => setActiveFolderId(folder.id)}
+                  className={`px-8 py-3 rounded-full font-cinzel text-xs tracking-widest transition-all ${
+                    activeFolderId === folder.id 
+                    ? 'bg-brand-soft-gold text-brand-nordic-blue shadow-xl scale-105 font-bold' 
+                    : 'bg-white text-brand-nordic-blue/60 hover:bg-brand-soft-gold/20'
+                  }`}
+                >
+                  {folder.name.toUpperCase()}
+                </button>
+              ))}
+            </div>
+          )}
+
           {loading ? (
             <div className="flex flex-col items-center justify-center py-40 gap-4">
               <div className="animate-spin rounded-full h-12 w-12 border-4 border-brand-soft-gold border-t-transparent"></div>
@@ -60,7 +105,7 @@ export default function GalleryPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
-              {items.map((item) => (
+              {filteredItems.map((item) => (
                 <div 
                   key={item.id} 
                   className="group bg-white rounded-[2rem] overflow-hidden shadow-2xl border border-brand-light-gray transition-all hover:-translate-y-2"
@@ -105,7 +150,7 @@ export default function GalleryPage() {
                 </div>
               ))}
               
-              {items.length === 0 && (
+              {filteredItems.length === 0 && (
                 <div className="col-span-full py-40 text-center space-y-6">
                   <p className="font-cinzel text-2xl text-brand-nordic-blue/30 tracking-widest italic">
                     PRÓXIMAMENTE MÁS CONTENIDO

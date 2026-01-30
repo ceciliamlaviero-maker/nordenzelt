@@ -18,7 +18,9 @@ import {
   AlertCircle,
   MessageCircle,
   Image as ImageIcon,
-  Upload
+  Upload,
+  FolderPlus,
+  FolderOpen
 } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -71,6 +73,13 @@ interface SiteService {
   display_order: number;
 }
 
+interface GalleryFolder {
+  id: string;
+  name: string;
+  description: string;
+  created_at: string;
+}
+
 interface GalleryItem {
   id: string;
   url: string;
@@ -79,6 +88,7 @@ interface GalleryItem {
   title: string;
   description: string;
   display_order: number;
+  folder_id?: string | null;
 }
 
 // --- Helper Functions ---
@@ -102,6 +112,10 @@ export default function AdminPage() {
   const [assets, setAssets] = useState<SiteAsset[]>([]);
   const [siteContent, setSiteContent] = useState<SiteContent[]>([]);
   const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
+  const [folders, setFolders] = useState<GalleryFolder[]>([]);
+  const [selectedFolderId, setSelectedFolderId] = useState<string | 'all'>('all');
+  const [isFolderModalOpen, setIsFolderModalOpen] = useState(false);
+  const [newFolder, setNewFolder] = useState({ name: '', description: '' });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<Partial<Event> | null>(null);
   const [loading, setLoading] = useState(false);
@@ -170,14 +184,57 @@ export default function AdminPage() {
 
   const fetchGallery = async () => {
     try {
-      const { data, error } = await supabase
+      const { data: galleryData, error: galleryError } = await supabase
         .from('gallery_content')
         .select('*')
         .order('created_at', { ascending: false });
-      if (error) throw error;
-      setGalleryItems(data || []);
+      if (galleryError) throw galleryError;
+      setGalleryItems(galleryData || []);
+
+      const { data: folderData, error: folderError } = await supabase
+        .from('gallery_folders')
+        .select('*')
+        .order('name', { ascending: true });
+      if (folderError) throw folderError;
+      setFolders(folderData || []);
     } catch (error) {
-      console.error('Error fetching gallery:', error);
+      console.error('Error fetching gallery data:', error);
+    }
+  };
+
+  const createFolder = async () => {
+    if (!newFolder.name) return;
+    setLoading(true);
+    try {
+      const { error } = await supabase
+        .from('gallery_folders')
+        .insert([newFolder]);
+      if (error) throw error;
+      setNewFolder({ name: '', description: '' });
+      setIsFolderModalOpen(false);
+      await fetchGallery();
+    } catch (error: any) {
+      console.error("Error creating folder:", error);
+      alert("Error al crear carpeta");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const deleteFolder = async (id: string) => {
+    if (!confirm("¿Estás seguro de eliminar esta carpeta? Los items dentro no se borrarán pero se quedarán sin carpeta.")) return;
+    setLoading(true);
+    try {
+      // First clear folder_id for items in this folder
+      await supabase.from('gallery_content').update({ folder_id: null }).eq('folder_id', id);
+      const { error } = await supabase.from('gallery_folders').delete().eq('id', id);
+      if (error) throw error;
+      await fetchGallery();
+      if (selectedFolderId === id) setSelectedFolderId('all');
+    } catch (error: any) {
+      console.error("Error deleting folder:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -281,7 +338,8 @@ export default function AdminPage() {
           storage_path: filePath, 
           type: fileType,
           title: 'Nuevo Item',
-          description: ''
+          description: '',
+          folder_id: selectedFolderId === 'all' ? null : selectedFolderId
         }]);
 
       if (dbError) throw dbError;
@@ -685,30 +743,77 @@ export default function AdminPage() {
 
         {view === 'galeria' && (
           <div className="flex-1 flex flex-col min-h-0 space-y-6 overflow-hidden pb-4">
-            <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-brand-light-gray/20 flex justify-between items-center">
+            <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-brand-light-gray/20 flex flex-wrap justify-between items-center gap-4">
               <div>
                 <h3 className="text-2xl font-bold text-brand-nordic-blue mb-2">Gestión de Galería</h3>
-                <p className="text-sm text-brand-nordic-blue/60">Sube fotos o videos para la sección de galería.</p>
+                <p className="text-sm text-brand-nordic-blue/60">Organiza fotos y videos en carpetas sectorizadas.</p>
               </div>
-              <label className={cn(
-                "flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all cursor-pointer",
-                uploading ? "bg-brand-light-gray text-brand-nordic-blue/40 cursor-not-allowed" : "bg-brand-soft-gold text-brand-nordic-blue hover:bg-opacity-80"
-              )}>
-                {uploading ? <div className="animate-spin rounded-full h-4 w-4 border-2 border-brand-nordic-blue border-t-transparent"></div> : <Upload size={18} />}
-                {uploading ? 'Subiendo...' : 'Subir Multimedia'}
-                <input 
-                  type="file" 
-                  accept="image/*,video/*" 
-                  className="hidden" 
-                  onChange={handleGalleryUpload}
-                  disabled={uploading}
-                />
-              </label>
+              <div className="flex items-center gap-3">
+                <button 
+                  onClick={() => setIsFolderModalOpen(true)}
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold border-2 border-brand-soft-gold text-brand-nordic-blue hover:bg-brand-soft-gold/10 transition-all"
+                >
+                  <FolderPlus size={16} /> Nueva Carpeta
+                </button>
+                <label className={cn(
+                  "flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all cursor-pointer",
+                  uploading ? "bg-brand-light-gray text-brand-nordic-blue/40 cursor-not-allowed" : "bg-brand-soft-gold text-brand-nordic-blue hover:bg-opacity-80"
+                )}>
+                  {uploading ? <div className="animate-spin rounded-full h-4 w-4 border-2 border-brand-nordic-blue border-t-transparent"></div> : <Upload size={18} />}
+                  {uploading ? 'Subiendo...' : 'Subir Multimedia'}
+                  <input 
+                    type="file" 
+                    accept="image/*,video/*" 
+                    className="hidden" 
+                    onChange={handleGalleryUpload}
+                    disabled={uploading}
+                  />
+                </label>
+              </div>
+            </div>
+
+            {/* Folder Selection Bar */}
+            <div className="flex items-center gap-2 overflow-x-auto pb-2 custom-scrollbar">
+              <button 
+                onClick={() => setSelectedFolderId('all')}
+                className={cn(
+                  "px-6 py-2 rounded-full text-sm font-bold whitespace-nowrap transition-all",
+                  selectedFolderId === 'all' 
+                    ? "bg-brand-nordic-blue text-white shadow-lg" 
+                    : "bg-white text-brand-nordic-blue/60 hover:bg-brand-light-gray/50"
+                )}
+              >
+                Ver Todo
+              </button>
+              {folders.map(folder => (
+                <div key={folder.id} className="flex items-center group">
+                  <button 
+                    onClick={() => setSelectedFolderId(folder.id)}
+                    className={cn(
+                      "px-6 py-2 rounded-full text-sm font-bold whitespace-nowrap transition-all flex items-center gap-2",
+                      selectedFolderId === folder.id 
+                        ? "bg-brand-soft-gold text-brand-nordic-blue shadow-lg" 
+                        : "bg-white text-brand-nordic-blue/60 hover:bg-brand-light-gray/50"
+                    )}
+                  >
+                    <FolderOpen size={14} />
+                    {folder.name}
+                  </button>
+                  <button 
+                    onClick={() => deleteFolder(folder.id)}
+                    className="w-0 overflow-hidden group-hover:w-8 group-hover:ml-2 text-red-500 hover:text-red-700 transition-all"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </div>
+              ))}
             </div>
 
             <div className="flex-1 overflow-y-auto custom-scrollbar pr-2">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {galleryItems.map(item => (
+                {galleryItems
+                  .filter(item => selectedFolderId === 'all' || item.folder_id === selectedFolderId)
+                  .map(item => (
                   <div key={item.id} className="bg-white rounded-[2rem] shadow-sm border border-brand-light-gray/20 overflow-hidden flex flex-col">
                     <div className="aspect-video relative bg-black flex items-center justify-center">
                       {item.type === 'image' ? (
@@ -724,6 +829,19 @@ export default function AdminPage() {
                       </button>
                     </div>
                     <div className="p-6 space-y-4 flex-1 flex flex-col">
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-bold uppercase tracking-widest text-brand-nordic-blue/40">Carpeta</label>
+                        <select 
+                          value={item.folder_id || ''}
+                          onChange={(e) => updateGalleryItem(item.id, { folder_id: e.target.value || null })}
+                          className="w-full bg-brand-light-gray/5 border border-brand-light-gray/20 rounded-xl px-4 py-2 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-brand-soft-gold"
+                        >
+                          <option value="">Sin Carpeta</option>
+                          {folders.map(f => (
+                            <option key={f.id} value={f.id}>{f.name}</option>
+                          ))}
+                        </select>
+                      </div>
                       <div className="space-y-1">
                         <label className="text-[10px] font-bold uppercase tracking-widest text-brand-nordic-blue/40">Título</label>
                         <input 
@@ -748,9 +866,9 @@ export default function AdminPage() {
                   </div>
                 ))}
               </div>
-              {galleryItems.length === 0 && (
+              {galleryItems.filter(item => selectedFolderId === 'all' || item.folder_id === selectedFolderId).length === 0 && (
                 <div className="py-20 text-center bg-white rounded-[2rem] border-2 border-dashed border-brand-light-gray/20">
-                  <p className="text-brand-nordic-blue/40 font-medium italic">No hay elementos en la galería todavía.</p>
+                  <p className="text-brand-nordic-blue/40 font-medium italic">No hay elementos en esta sección todavía.</p>
                 </div>
               )}
             </div>
@@ -1280,6 +1398,55 @@ export default function AdminPage() {
                   </button>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Folder Creation Modal */}
+      {isFolderModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-brand-nordic-blue/40 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white w-full max-w-md rounded-[2rem] shadow-2xl overflow-hidden border border-brand-light-gray">
+            <div className="p-6 border-b border-brand-light-gray/20 flex justify-between items-center bg-brand-light-gray/5">
+              <h3 className="text-xl font-bold text-brand-nordic-blue flex items-center gap-2">
+                <FolderPlus size={24} className="text-brand-soft-gold" />
+                Nueva Carpeta
+              </h3>
+              <button 
+                onClick={() => setIsFolderModalOpen(false)}
+                className="p-2 hover:bg-brand-light-gray rounded-full transition-all"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            
+            <div className="p-8 space-y-6">
+              <div className="space-y-2">
+                <label className="text-xs font-bold uppercase tracking-widest text-brand-nordic-blue/60">Nombre de la Carpeta</label>
+                <input 
+                  type="text"
+                  value={newFolder.name}
+                  onChange={(e) => setNewFolder({...newFolder, name: e.target.value})}
+                  placeholder="Ej: Eventos Corporativos"
+                  className="w-full px-4 py-3 rounded-xl border border-brand-light-gray focus:outline-none focus:ring-2 focus:ring-brand-soft-gold"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-xs font-bold uppercase tracking-widest text-brand-nordic-blue/60">Descripción (Opcional)</label>
+                <textarea 
+                  value={newFolder.description}
+                  onChange={(e) => setNewFolder({...newFolder, description: e.target.value})}
+                  className="w-full px-4 py-3 rounded-xl border border-brand-light-gray focus:outline-none focus:ring-2 focus:ring-brand-soft-gold min-h-[100px]"
+                />
+              </div>
+              
+              <button 
+                onClick={createFolder}
+                disabled={loading || !newFolder.name}
+                className="w-full bg-brand-soft-gold text-brand-nordic-blue py-4 rounded-xl font-black hover:bg-opacity-90 transition-all disabled:opacity-50"
+              >
+                {loading ? 'Creando...' : 'Crear Carpeta'}
+              </button>
             </div>
           </div>
         </div>
