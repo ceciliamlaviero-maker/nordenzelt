@@ -253,8 +253,8 @@ export default function Home() {
                   </div>
 
                   <div className="relative group">
-                    <input {...register("ubicacion", { required: true })} placeholder="Ubicación del Evento (Localidad/Zona)*" className="peer w-full py-3 border-b-2 border-brand-light-gray focus:border-brand-soft-gold outline-none transition-all placeholder-transparent text-brand-nordic-blue font-medium" />
-                    <label className="absolute left-0 -top-3.5 text-brand-nordic-blue/60 text-sm transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-brand-nordic-blue peer-focus:text-sm">Ubicación del Evento (Localidad/Zona)*</label>
+                    <input {...register("ubicacion", { required: true })} placeholder="Ubicación (Localidad/Zona)*" className="peer w-full py-3 border-b-2 border-brand-light-gray focus:border-brand-soft-gold outline-none transition-all placeholder-transparent text-brand-nordic-blue font-medium bg-transparent" />
+                    <label className="absolute left-0 -top-3.5 text-brand-nordic-blue/60 text-sm transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-brand-nordic-blue peer-focus:text-sm whitespace-nowrap overflow-hidden text-ellipsis max-w-full">Ubicación (Localidad/Zona)*</label>
                   </div>
                 </div>
 
